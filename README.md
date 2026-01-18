@@ -2,6 +2,8 @@
 
 A new Flutter project.
 
+> Test commit - repository cloned and configured successfully.
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
