@@ -1,0 +1,604 @@
+{
+  "@@locale": "ar",
+  "appTitle": "تطبيق نيكستبيتال المحمول",
+  "welcome": "مرحباً",
+  "login": "تسجيل الدخول",
+  "logout": "تسجيل الخروج",
+  "email": "البريد الإلكتروني",
+  "password": "كلمة المرور",
+  "dashboard": "لوحة التحكم",
+  "patients": "المرضى",
+  "appointments": "المواعيد",
+  "medicalRecords": "السجلات الطبية",
+  "settings": "الإعدادات",
+  "language": "اللغة",
+  "english": "الإنجليزية",
+  "french": "الفرنسية",
+  "arabic": "العربية",
+  "save": "حفظ",
+  "cancel": "إلغاء",
+  "delete": "حذف",
+  "edit": "تعديل",
+  "add": "إضافة",
+  "search": "بحث",
+  "loading": "جاري التحميل...",
+  "error": "خطأ",
+  "success": "نجاح",
+  "noData": "لا توجد بيانات متاحة",
+  "main": "الرئيسي",
+  "overview": "نظرة عامة",
+  "quickActions": "إجراءات سريعة",
+  "createAppointment": "إنشاء موعد",
+  "newAppointment": "موعد جديد",
+  "createPrescription": "إنشاء وصفة طبية",
+  "newPrescription": "وصفة طبية جديدة",
+  "newInvoice": "فاتورة جديدة",
+  "createInvoice": "إنشاء فاتورة",
+  "createMedicalRecord": "إنشاء سجل طبي",
+  "newRecord": "سجل جديد",
+  "calendarAndAppointments": "التقويم والمواعيد",
+  "calendar": "التقويم",
+  "allServices": "جميع الخدمات",
+  "calendarView": "عرض التقويم",
+  "allAppointments": "جميع المواعيد",
+  "appointmentRequests": "طلبات المواعيد",
+  "managePendingRequests": "إدارة الطلبات المعلقة",
+  "waitingRoom": "غرفة الانتظار",
+  "waitingRoomDisplay": "عرض غرفة الانتظار",
+  "management": "الإدارة",
+  "patientList": "قائمة المرضى",
+  "doctors": "الأطباء",
+  "manageDoctors": "إدارة الأطباء",
+  "medications": "الأدوية",
+  "manageMedications": "إدارة الأدوية",
+  "reports": "التقارير",
+  "viewReports": "عرض التقارير",
+  "invoices": "الفواتير",
+  "invoiceManagement": "إدارة الفواتير",
+  "myPrescriptions": "وصفاتي الطبية",
+  "myPrescriptionsSubtitle": "وصفاتي الطبية",
+  "doctorTools": "أدوات الطبيب",
+  "patientHistory": "تاريخ المريض",
+  "medicalHistory": "التاريخ الطبي",
+  "diagnosis": "التشخيص",
+  "diagnosticTools": "أدوات التشخيص",
+  "labResults": "نتائج المختبر",
+  "analysesAndTests": "التحليلات والاختبارات",
+  "medicalReports": "التقارير الطبية",
+  "reportsAndStatistics": "التقارير والإحصائيات",
+  "clinicalNotes": "الملاحظات السريرية",
+  "notesAndObservations": "الملاحظات والمراقبة",
+  "vaccinations": "التطعيمات",
+  "vaccinationManagement": "إدارة التطعيمات",
+  "emergencies": "الطوارئ",
+  "emergencyCases": "حالات الطوارئ",
+  "consultations": "الاستشارات",
+  "myConsultations": "استشاراتي",
+  "helpAndSupport": "المساعدة والدعم",
+  "needHelp": "تحتاج مساعدة؟",
+  "rateApp": "تقييم التطبيق",
+  "rateOnPlayStore": "التقييم على متجر Play",
+  "organization": "المنظمة",
+  "change": "تغيير",
+  "forgotPassword": "نسيت كلمة المرور؟",
+  "rememberMe": "تذكرني",
+  "dontHaveAccount": "ليس لديك حساب؟",
+  "register": "التسجيل",
+  "pleaseEnterEmail": "الرجاء إدخال عنوان بريدك الإلكتروني",
+  "today": "اليوم",
+  "thisWeek": "هذا الأسبوع",
+  "thisMonth": "هذا الشهر",
+  "thisYear": "هذا العام",
+  "all": "الكل",
+  "configuration": "الإعدادات",
+  "services": "الخدمات",
+  "manageServices": "إدارة الخدمات",
+  "allRecords": "جميع السجلات",
+  "hospitalReports": "تقارير المستشفى",
+  "medicalPracticeManagement": "إدارة الممارسة الطبية",
+  "signInToContinue": "قم بتسجيل الدخول للمتابعة",
+  "emailAddress": "عنوان البريد الإلكتروني",
+  "pleaseEnterValidEmail": "الرجاء إدخال بريد إلكتروني صحيح",
+  "pleaseEnterPassword": "الرجاء إدخال كلمة المرور",
+  "passwordMustBeAtLeast": "يجب أن تكون كلمة المرور 6 أحرف على الأقل",
+  "resetPassword": "إعادة تعيين كلمة المرور",
+  "backToLogin": "العودة لتسجيل الدخول",
+  "sendResetLink": "إرسال رابط إعادة التعيين",
+  "day": "يوم",
+  "week": "أسبوع",
+  "month": "شهر",
+  "totalPatients": "إجمالي المرضى",
+  "totalAppointments": "إجمالي المواعيد",
+  "pendingInvoices": "الفواتير المعلقة",
+  "requiresAction": "يتطلب إجراء",
+  "urgentCases": "الحالات العاجلة",
+  "highPriorityCases": "حالات ذات أولوية عالية",
+  "totalPrescriptions": "إجمالي الوصفات الطبية",
+  "active": "نشط",
+  "expired": "منتهي الصلاحية",
+  "patientsWaiting": "المرضى في الانتظار",
+  "analysisOverview": "نظرة عامة على التحليل",
+  "appointmentStatus": "حالة الموعد",
+  "quickActions": "إجراءات سريعة",
+  "user": "المستخدم",
+  "hello": "مرحباً",
+  "reviewDialogTitle": "مرحباً! 👋",
+  "reviewDialogMessage": "لقد كنت تستخدم ProDoc لفترة من الوقت الآن. هل أنت مستعد لترك تقييم لنا على متجر Play؟ سيساعدنا ذلك كثيراً!",
+  "rateNow": "قيم الآن ⭐",
+  "maybeLater": "ربما لاحقاً",
+  "cannotOpenPlayStore": "تعذر فتح متجر Play. يرجى المحاولة مرة أخرى لاحقاً.",
+  "monthlyAppointments": "المواعيد الشهرية",
+  "prescriptions": "الوصفات الطبية",
+  "monthlyPrescriptions": "الوصفات الطبية الشهرية",
+  "or": "أو",
+  "continueWithGoogle": "المتابعة مع Google",
+  "poweredBy": "مدعوم من",
+  "proDoc": "ProDoc",
+  "bookAppointment": "حجز موعد",
+  "onlineBooking": "الحجز عبر الإنترنت",
+  "onlineBookingHeader": "الحجز عبر الإنترنت",
+  "onlineBookingSubheader": "حدد موعد استشارتك بنقرات قليلة فقط",
+  "bookForMe": "احجز لي",
+  "someoneElse": "شخص آخر",
+  "appointmentConfirmedTitle": "تم تأكيد الموعد!",
+  "appointmentRequestSentDetails": "تم إرسال طلب الموعد بنجاح! سنقوم بتأكيد موعدك في أقرب وقت ممكن.",
+  "appointmentRequestSentSuccess": "تم إرسال طلب الموعد بنجاح!",
+  "desiredService": "الخدمة المطلوبة",
+  "doctorOrResponsible": "الطبيب / المسؤول",
+  "appointmentDate": "تاريخ الموعد",
+  "additionalNotesOptional": "ملاحظات إضافية (اختياري)",
+  "confirmAppointment": "تأكيد الموعد",
+  "fullNameLabel": "الاسم الكامل",
+  "emailAddressLabel": "البريد الإلكتروني",
+  "emailAddressOptional": "البريد الإلكتروني (اختياري)",
+  "phoneNumberLabel": "رقم الهاتف",
+  "personalInformation": "المعلومات الشخصية",
+  "pleaseSelectService": "يرجى اختيار الخدمة",
+  "pleaseSelectDoctor": "يرجى اختيار الطبيب",
+  "pleaseSelectDate": "يرجى اختيار التاريخ",
+  "pleaseSelectTimeSlot": "يرجى اختيار الوقت المتاح",
+  "nameRequired": "الاسم مطلوب",
+  "emailRequired": "البريد الإلكتروني مطلوب",
+  "invalidEmail": "البريد الإلكتروني غير صحيح",
+  "phoneRequired": "رقم الهاتف مطلوب",
+  "loadingTimeSlots": "جاري تحميل المواعيد المتاحة...",
+  "describeSymptoms": "صف أعراضك أو أسباب الاستشارة...",
+  "noTimeSlotsAvailable": "لا توجد مواعيد متاحة",
+  "pleaseSelectAnotherDate": "يرجى اختيار تاريخ آخر",
+  "selectDate": "اختر تاريخاً",
+  "back": "رجوع",
+  "addItem": "إضافة عنصر",
+  "addItemManually": "إضافة عنصر يدوياً",
+  "reset": "إعادة تعيين",
+  "retry": "إعادة المحاولة",
+  "confirm": "تأكيد",
+  "confirmation": "تأكيد",
+  "public": "عام",
+  "private": "خاص",
+  "publicDescription": "عام (مرئي للموظفين المصرح لهم)",
+  "privateDescription": "خاص (أنت فقط)",
+  "chooseVisibility": "اختر الرؤية",
+  "@chooseVisibility": {
+    "description": "عنوان مربع حوار اختيار الرؤية"
+  },
+  "visibility": "الرؤية",
+  "@visibility": {
+    "description": "تسمية الرؤية"
+  },
+  "changeToPublic": "تغيير إلى عام",
+  "@changeToPublic": {
+    "description": "زر لتغيير الرؤية إلى عام"
+  },
+  "changeToPrivate": "تغيير إلى خاص",
+  "@changeToPrivate": {
+    "description": "زر لتغيير الرؤية إلى خاص"
+  },
+  "visibleToAllAuthorized": "مرئي لجميع المستخدمين المصرح لهم",
+  "@visibleToAllAuthorized": {
+    "description": "وصف الرؤية العامة"
+  },
+  "onlyVisibleToDoctorAndAdmin": "مرئي فقط للطبيب المعين والمسؤول",
+  "@onlyVisibleToDoctorAndAdmin": {
+    "description": "وصف الرؤية الخاصة"
+  },
+  "visibilityUpdated": "تم تحديث الرؤية إلى {visibility}",
+  "@visibilityUpdated": {
+    "description": "رسالة نجاح عند تحديث الرؤية",
+    "placeholders": {
+      "visibility": {
+        "type": "String",
+        "example": "عام"
+      }
+    }
+  },
+  "chooseVisibility": "اختر الرؤية",
+  "createNewMedicalRecord": "إنشاء سجل طبي جديد",
+  "startWithEmptyForm": "ابدأ بنموذج فارغ",
+  "deleteAttachment": "حذف المرفق",
+  "attachmentDeleted": "تم حذف المرفق",
+  "pdfUrlNotAvailable": "رابط PDF غير متاح",
+  "pdfDownloaded": "تم تنزيل PDF",
+  "unableToOpenPdf": "تعذر فتح PDF",
+  "errorOpeningPdf": "خطأ في فتح PDF",
+  "unableToOpenFile": "تعذر فتح الملف",
+  "errorOpening": "خطأ في الفتح",
+  "unableToReadFile": "تعذر قراءة الملف. يرجى المحاولة مرة أخرى.",
+  "filePathNotAvailable": "مسار الملف غير متاح. يرجى المحاولة مرة أخرى.",
+  "fileDoesNotExist": "الملف غير موجود",
+  "errorSelectingFile": "خطأ في اختيار الملف",
+  "confirmDelete": "تأكيد الحذف",
+  "confirmDeletion": "تأكيد الحذف",
+  "unableToEditAppointment": "تعذر تعديل هذا الموعد",
+  "unableToCall": "تعذر الاتصال",
+  "unableToOpenWhatsApp": "تعذر فتح WhatsApp",
+  "unableToGenerateGoogleCalendarLink": "تعذر إنشاء رابط Google Calendar",
+  "errorLoadingDoctors": "خطأ في تحميل الأطباء",
+  "errorSearchingPatients": "خطأ في البحث عن المرضى",
+  "errorSearching": "خطأ في البحث",
+  "errorLoadingAppointments": "خطأ في تحميل المواعيد",
+  "errorDownloading": "خطأ في التنزيل",
+  "pleaseSelectPatient": "الرجاء اختيار مريض",
+  "invoiceCreatedSuccessfully": "تم إنشاء الفاتورة بنجاح!",
+  "pending": "قيد الانتظار",
+  "scheduled": "مجدول",
+  "completed": "مكتمل",
+  "cancelled": "ملغي",
+  "noShow": "لم يحضر",
+  "high": "عالي",
+  "medium": "متوسط",
+  "low": "منخفض",
+  "priority": "الأولوية",
+  "period": "الفترة",
+  "start": "البداية",
+  "end": "النهاية",
+  "select": "اختر",
+  "previous": "السابق",
+  "next": "التالي",
+  "page": "الصفحة",
+  "selected": "محدد",
+  "clear": "مسح",
+  "markAsCompleted": "وضع علامة كمكتمل",
+  "reschedule": "إعادة الجدولة",
+  "viewDetails": "عرض التفاصيل",
+  "sendWhatsAppReminder": "إرسال تذكير WhatsApp",
+  "viewPrescriptions": "عرض الوصفات",
+  "accessInvoice": "الوصول إلى الفاتورة",
+  "noAppointments": "لا توجد مواعيد",
+  "adjustYourFilters": "قم بتعديل المرشحات أو إنشاء موعد جديد.",
+  "appointmentRequests": "طلبات المواعيد",
+  "searchRequests": "البحث عن الطلبات...",
+  "noRequestsPending": "لا توجد طلبات مواعيد معلقة.",
+  "noRequestsMatch": "لا توجد طلبات مواعيد تطابق معايير البحث الخاصة بك.",
+  "rejectRequest": "رفض طلب الموعد",
+  "selectReason": "اختر السبب",
+  "doctorUnavailable": "الطبيب غير متاح",
+  "timeSlotTaken": "الوقت محجوز",
+  "incompleteInformation": "معلومات غير مكتملة",
+  "serviceUnavailable": "الخدمة غير متاحة",
+  "other": "أخرى",
+  "enterCustomReason": "أدخل سبباً مخصصاً",
+  "submitRejection": "إرسال الرفض",
+  "updateAndConfirm": "تحديث وتأكيد",
+  "updateAppointmentDateTime": "تحديث تاريخ ووقت الموعد",
+  "selectDateAndTime": "الرجاء اختيار التاريخ والوقت.",
+  "enterValidTime": "الرجاء إدخال وقت صحيح بصيغة HH:mm (مثال: 19:59).",
+  "attachFiles": "إرفاق الملفات",
+  "attachFilesToMedicalRecord": "إرفاق الملفات بالسجل الطبي",
+  "addAttachment": "إضافة مرفق",
+  "chooseOption": "اختر خياراً لإضافة ملف",
+  "camera": "الكاميرا",
+  "takePhoto": "التقاط صورة",
+  "gallery": "المعرض",
+  "chooseImage": "اختر صورة",
+  "file": "ملف",
+  "chooseFile": "اختر ملفاً",
+  "selectedFiles": "الملفات المحددة",
+  "uploadFiles": "رفع الملفات",
+  "uploading": "جاري الرفع...",
+  "noFilesSelected": "لم يتم اختيار ملفات",
+  "addFiles": "إضافة ملفات",
+  "back": "رجوع",
+  "upload": "رفع",
+  "selectPatient": "اختر المريض",
+  "selectRecord": "اختر السجل",
+  "recordId": "رقم السجل",
+  "diagnosis": "التشخيص",
+  "filesAttachedSuccessfully": "تم إرفاق الملفات بنجاح",
+  "filesUploadedSuccessfully": "تم رفع الملف(الملفات) بنجاح",
+  "filesFailed": "فشل رفع الملف(الملفات)",
+  "viewRecord": "عرض السجل",
+  "viewProfile": "عرض الملف الشخصي",
+  "fileUploadFailed": "فشل رفع الملف",
+  "noPatientsFound": "لم يتم العثور على مرضى",
+  "noMedicalRecordsFound": "لم يتم العثور على سجلات طبية",
+  "cannotReadFile": "تعذر قراءة الملف. يرجى المحاولة مرة أخرى.",
+  "filePathNotAvailable": "مسار الملف غير متاح. يرجى المحاولة مرة أخرى.",
+  "errorSelectingFiles": "خطأ في اختيار الملفات",
+  "searchForPatient": "البحث عن مريض...",
+  "selectMedicalRecord": "اختر السجل الطبي",
+  "pleaseSelectRecordAndFiles": "الرجاء اختيار سجل وملفات",
+  "close": "إغلاق",
+  "appointmentUpdatedSuccessfully": "تم تحديث الموعد بنجاح",
+  "statusChangedTo": "تم تغيير الحالة إلى",
+  "doYouWantToChangeStatus": "هل تريد حقاً تغيير الحالة إلى",
+  "doYouWantToChangeStatusOf": "هل تريد حقاً تغيير حالة",
+  "appointmentsTo": "مواعيد إلى",
+  "appointmentsUpdated": "تم تحديث المواعيد",
+  "appointmentsUpdatedFailed": "تم تحديث المواعيد، فشل",
+  "statusOfAppointmentsChanged": "تم تغيير حالة المواعيد إلى",
+  "reminderSentTo": "تم إرسال التذكير إلى",
+  "forAppointment": "للموعد",
+  "appointmentDetails": "تفاصيل الموعد",
+  "appointment": "الموعد",
+  "phone": "الهاتف",
+  "doctorEmail": "بريد الطبيب الإلكتروني",
+  "time": "الوقت",
+  "status": "الحالة",
+  "createdAt": "تم الإنشاء في",
+  "updatedAt": "تم التحديث في",
+  "notes": "ملاحظات",
+  "sending": "جاري الإرسال...",
+  "sendingWhatsAppReminder": "جاري إرسال تذكير WhatsApp...",
+  "whatsAppReminderSentSuccessfully": "تم إرسال تذكير WhatsApp بنجاح!",
+  "failedToSendWhatsAppReminder": "فشل إرسال تذكير WhatsApp. يرجى المحاولة مرة أخرى.",
+  "dailyMessageLimitReached": "تم الوصول إلى الحد اليومي للرسائل. يرجى المحاولة مرة أخرى غداً.",
+  "editAppointment": "تعديل الموعد",
+  "cannotEditAppointment": "تعذر تعديل هذا الموعد",
+  "pleaseSelectTime": "الرجاء اختيار الوقت",
+  "noTimeSlotsAvailable": "لا توجد أوقات متاحة لهذا التاريخ",
+  "noTimeSlotsAvailableShort": "لا توجد أوقات متاحة",
+  "unknown": "غير معروف",
+  "unknownService": "خدمة غير معروفة",
+  "unknownDate": "تاريخ غير معروف",
+  "invalidDate": "تاريخ غير صحيح",
+  "quickStatistics": "إحصائيات سريعة",
+  "advancedFilters": "مرشحات متقدمة",
+  "showAdvancedFilters": "إظهار المرشحات المتقدمة",
+  "hideAdvancedFilters": "إخفاء المرشحات المتقدمة",
+  "quickFilters": "مرشحات سريعة",
+  "searchOrQuicklySelect": "البحث أو الاختيار السريع للحالة",
+  "export": "تصدير",
+  "exportAvailableSoon": "سيتم توفير التصدير قريباً.",
+  "listRefreshed": "تم تحديث القائمة",
+  "statistics": "الإحصائيات",
+  "viewStatistics": "عرض الإحصائيات",
+  "refresh": "تحديث",
+  "refreshList": "تحديث القائمة",
+  "endOfResults": "نهاية النتائج.",
+  "viewPrescriptionsAvailableSoon": "سيتم توفير عرض الوصفات قريباً.",
+  "invoiceAccessAvailableSoon": "سيتم توفير الوصول إلى الفاتورة قريباً.",
+  "billingComingSoon": "سيتم توفير الفوترة قريباً.",
+  "details": "التفاصيل",
+  "invoice": "الفاتورة",
+  "whatsApp": "WhatsApp",
+  "appointmentNumber": "الموعد",
+  "doctor": "الطبيب",
+  "patient": "المريض",
+  "id": "الرقم",
+  "actions": "الإجراءات",
+  "searchPatientDoctorService": "البحث عن مريض، طبيب، خدمة...",
+  "listView": "عرض القائمة",
+  "gridView": "عرض الشبكة",
+  "successTitle": "نجاح",
+  "errorTitle": "خطأ",
+  "warningTitle": "تحذير",
+  "appointmentConfirmed": "تم تأكيد الموعد! يمكن للمريض رؤيته في لوحة التحكم أو التقويم.",
+  "pleaseSelectNewDateTime": "الرجاء اختيار تاريخ أو وقت جديد لهذا الموعد.",
+  "confirmationFailed": "فشل التأكيد: لم يتم العثور على الطبيب.",
+  "confirmationFailedInvalidTime": "فشل التأكيد: وقت الطلب غير صحيح. يرجى تصحيح الوقت.",
+  "confirmationFailedError": "فشل التأكيد",
+  "appointmentUpdatedConfirmed": "تم تحديث وتأكيد الموعد بنجاح!",
+  "newTimeOutsideAvailability": "الوقت الجديد المحدد لا يزال خارج ساعات التوفر. يرجى اختيار وقت آخر.",
+  "timeConflict": "تعارض في الوقت مع الوقت الجديد المحدد. يرجى اختيار وقت آخر.",
+  "updateConfirmationFailed": "فشل التحديث والتأكيد",
+  "requestRejectedSuccessfully": "تم رفض طلب الموعد بنجاح",
+  "rejectionFailed": "فشل الرفض",
+  "pleaseSelectRejectionReason": "الرجاء اختيار سبب الرفض",
+  "updateAppointmentDateTimeDesc": "الوقت أو التاريخ المحدد غير متاح أو غير صحيح. يرجى اختيار تاريخ ووقت جديدين بصيغة HH:mm (مثال: 19:59).",
+  "doctorAvailableFrom": "الطبيب متاح من",
+  "to": "إلى",
+  "date": "التاريخ",
+  "hour": "الساعة",
+  "hourFormat": "الوقت (HH:mm)",
+  "hourFormatHint": "HH:mm (مثال: 19:59)",
+  "confirmation": "تأكيد",
+  "reset": "إعادة تعيين",
+  "fileDoesNotExist": "الملف غير موجود",
+  "goodMorning": "صباح الخير",
+  "goodAfternoon": "مساء الخير",
+  "goodEvening": "مساء الخير",
+  "openingAppointment": "فتح الموعد",
+  "openingPrescription": "فتح الوصفة",
+  "issued": "صدر",
+  "downloadPdf": "تحميل PDF",
+  "urgentCases": "حالات عاجلة",
+  "highPriorityCases": "حالات ذات أولوية عالية",
+  "allDoctors": "جميع الأطباء",
+  "todaysSchedule": "جدول اليوم",
+  "activeAppointments": "المواعيد النشطة",
+  "patientsToday": "المرضى اليوم",
+  "appointmentsList": "قائمة المواعيد",
+  "viewAllAppointments": "عرض جميع المواعيد",
+  "doctorOverview": "نظرة عامة على الطبيب",
+  "upcomingAppointments": "المواعيد القادمة",
+  "recentAppointments": "المواعيد الأخيرة",
+  "recentPrescriptions": "الوصفات الأخيرة",
+  "receptionistOverview": "نظرة عامة على الاستقبال",
+  "pendingRequests": "الطلبات المعلقة",
+  "patientDetails": "تفاصيل المريض",
+  "information": "المعلومات",
+  "records": "السجلات",
+  "labTests": "اختبارات المختبر",
+  "certificates": "الشهادات",
+  "searchType": "نوع البحث",
+  "filtersAndSort": "المرشحات والترتيب",
+  "sortBy": "ترتيب حسب",
+  "order": "الترتيب",
+  "ascending": "تصاعدي",
+  "descending": "تنازلي",
+  "name": "الاسم",
+  "gender": "الجنس",
+  "birthDate": "تاريخ الميلاد",
+  "bloodType": "فصيلة الدم",
+  "insurance": "التأمين",
+  "listView": "عرض القائمة",
+  "gridView": "عرض الشبكة",
+  "noPatientFound": "لم يتم العثور على مريض",
+  "noPatientsAvailable": "لا يوجد مرضى متاحون",
+  "tryAnotherSearch": "جرب بحثاً آخر أو عدّل المرشحات",
+  "startByAddingPatients": "ابدأ بإضافة مرضى",
+  "searchByPatient": "البحث عن مريض، تشخيص، أعراض...",
+  "searchFilters": "مرشحات البحث",
+  "searchPatient": "البحث عن مريض",
+  "nameEmailOrPhone": "الاسم، البريد الإلكتروني أو الهاتف...",
+  "cniNumber": "رقم الهوية",
+  "date": "التاريخ",
+  "reset": "إعادة تعيين",
+  "noMedicalRecordsFound": "لم يتم العثور على سجلات طبية",
+  "tryModifyingSearch": "حاول تعديل معايير البحث الخاصة بك",
+  "recordNumber": "السجل #{number}",
+  "doctor": "الطبيب",
+  "specialty": "التخصص",
+  "diagnosis": "التشخيص",
+  "unknownPatient": "مريض غير معروف",
+  "unknownDoctor": "طبيب غير معروف",
+  "insuranceNA": "التأمين غير متاح",
+  "unknownGroup": "مجموعة غير معروفة",
+  "showsOnlyPatientsWithAppointments": "يعرض فقط المرضى الذين لديهم مواعيد في الفترة المحددة.",
+  "medicalRecordDetails": "تفاصيل السجل الطبي",
+  "details": "التفاصيل",
+  "attachments": "المرفقات",
+  "addAttachment": "إضافة مرفق",
+  "generalInformation": "المعلومات العامة",
+  "vitalSigns": "العلامات الحيوية",
+  "bloodPressure": "ضغط الدم",
+  "weight": "الوزن",
+  "height": "الطول",
+  "temperature": "درجة الحرارة",
+  "heartRate": "معدل ضربات القلب",
+  "respiratoryRate": "معدل التنفس",
+  "allergies": "الحساسية",
+  "medicalInformation": "المعلومات الطبية",
+  "symptoms": "الأعراض",
+  "treatment": "العلاج",
+  "notes": "الملاحظات",
+  "specialtyData": "بيانات التخصص",
+  "noPrescriptions": "لا توجد وصفات طبية",
+  "noPrescriptionsRecorded": "لم يتم تسجيل أي وصفات طبية لهذا السجل الطبي",
+  "prescriptionNumber": "الوصفة #{number}",
+  "medications": "الأدوية",
+  "createdOn": "تم الإنشاء في",
+  "noMedicalRecordsFoundForPatient": "لم يتم العثور على سجلات طبية",
+  "startByCreatingFirstMedicalRecord": "ابدأ بإنشاء أول سجل طبي لهذا المريض",
+  "subscriptionsTitle": "الاشتراكات",
+  "manageSubscriptionsFor": "إدارة الاشتراكات لـ {tenant}",
+  "@manageSubscriptionsFor": {
+    "description": "Subtitle showing tenant for subscription screen",
+    "placeholders": {
+      "tenant": {
+        "type": "String",
+        "example": "عيادتي"
+      }
+    }
+  },
+  "noActiveSubscription": "لا يوجد اشتراك نشط",
+  "noActiveSubscriptionDesc": "انتهى أو تم إيقاف اشتراكك. قد تكون بعض الميزات محدودة.",
+  "renewSamePlan": "تجديد نفس الخطة",
+  "choosePlan": "اختر خطة",
+  "pricePerInterval": "{price} / {interval}",
+  "@pricePerInterval": {
+    "description": "Price and interval formatting",
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "199.00"
+      },
+      "interval": {
+        "type": "String",
+        "example": "شهري"
+      }
+    }
+  },
+  "startDate": "تاريخ البدء:",
+  "endDate": "تاريخ الانتهاء:",
+  "daysLeft": "يتبقى {count} يوم",
+  "@daysLeft": {
+    "description": "Remaining days label",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "7"
+      }
+    }
+  },
+  "cancelSubscription": "إلغاء الاشتراك",
+  "upgradePlan": "ترقية / تغيير",
+  "pendingStatus": "قيد الانتظار",
+  "suspendedStatus": "معلق",
+  "expiredStatus": "منتهي",
+  "activeStatus": "نشط",
+  "ok": "موافق",
+  "years": "سنوات",
+  "newPatient": "مريض جديد",
+  "fullName": "الاسم الكامل",
+  "nameRequired": "الاسم مطلوب",
+  "male": "ذكر",
+  "female": "أنثى",
+  "address": "العنوان",
+  "insuranceType": "نوع التأمين",
+  "insuranceNumber": "رقم التأمين",
+  "service": "الخدمة",
+  "availableTimeSlots": "المواعيد المتاحة",
+  "highPriority": "عالي",
+  "mediumPriority": "متوسط",
+  "lowPriority": "منخفض",
+  "billingOptions": "خيارات الفوترة",
+  "generateInvoice": "إنشاء فاتورة",
+  "addAmount": "إضافة مبلغ",
+  "amount": "المبلغ",
+  "markAsPaid": "وضع علامة كمُدفوع",
+  "notifications": "الإشعارات",
+  "whatsapp": "واتساب",
+  "optional": "اختياري",
+  "create": "إنشاء",
+  "enterPatientName": "أدخل اسم المريض",
+  "enterPatientNameDescription": "أدخل اسم المريض أو البريد الإلكتروني أو رقم الهوية",
+  "enterPatientNameHint": "أدخل اسم المريض أو البريد الإلكتروني أو رقم الهوية",
+  "patientName": "اسم المريض",
+  "atLeast2CharactersRequired": "يجب إدخال حرفين على الأقل",
+  "findPatient": "التالي",
+  "appointmentCreated": "تم إنشاء الموعد!",
+  "clinicInfo": "معلومات العيادة",
+  "aboutUs": "معلومات عنا",
+  "call": "اتصال",
+  "followUs": "تابعنا",
+  "ourServices": "خدماتنا",
+  "workingHours": "ساعات العمل",
+  "closed": "مغلق",
+  "monday": "الاثنين",
+  "tuesday": "الثلاثاء",
+  "wednesday": "الأربعاء",
+  "thursday": "الخميس",
+  "friday": "الجمعة",
+  "saturday": "السبت",
+  "sunday": "الأحد",
+  "seeClinicInfo": "معلومات العيادة",
+  "map": "خريطة",
+  "healthOverview": "نظرة عامة على صحتك",
+  "upcomingVisitsStat": "الزيارات القادمة",
+  "scheduledAppointmentsStat": "المواعيد المجدولة",
+  "unpaidInvoicesStat": "الفواتير غير المدفوعة",
+  "activePrescriptionsStat": "الوصفات الطبية النشطة",
+  "inProgressStat": "قيد التنفيذ",
+  "myCalendarStat": "مواعيدي",
+  "agendaStat": "الجدول",
+  "manageMyDatesStat": "عرض المواعيد",
+  "yourPrescriptionsSection": "وصفاتك الطبية",
+  "medication": "دواء",
+  "medications": "أدوية",
+  "days": "أيام",
+  "timesPerDay": "مرات/يوم",
+  "more": "إضافي",
+  "noMedicationsRecorded": "لم يتم تسجيل أي أدوية",
+  "prescriptionLabel": "وصفة طبية"
+}

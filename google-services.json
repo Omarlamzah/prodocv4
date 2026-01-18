@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1048263640434",
+    "project_id": "nextpital",
+    "storage_bucket": "nextpital.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1048263640434:android:a18300600523c468b889eb",
+        "android_client_info": {
+          "package_name": "com.nextpital.prodoc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1048263640434-a900jmj626hm3sc1nvua492hvhp3njnl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nextpital.prodoc",
+            "certificate_hash": "adcd585c97c4264efcf33a55ef5e1ca45a47a70c959e30c4ef22567a05535d3d"
+          }
+        },
+        {
+          "client_id": "1048263640434-3updimfp5414dn6ubphntsstok4gjb1u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnXBxWDXkqW9qftBRQ7KIgi_qDJFiwJH4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1048263640434-3updimfp5414dn6ubphntsstok4gjb1u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
