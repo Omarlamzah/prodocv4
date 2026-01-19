@@ -1,4 +1,6 @@
 // lib/providers/auth_providers.dart - Complete Fixed Version
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -65,10 +67,10 @@ class AuthNotifier extends Notifier<AuthState> {
     _authService = ref.watch(authServiceProvider);
     _storageService = ref.watch(storageServiceProvider);
     _apiClient = ref.watch(apiClientProvider);
-    
+
     // Trigger initial check
     Future.microtask(() => _checkAuth());
-    
+
     return AuthState();
   }
 
@@ -239,20 +241,24 @@ class AuthNotifier extends Notifier<AuthState> {
       print('[Google Sign-In] Step 2: Getting GoogleSignIn instance');
       final googleSignIn = GoogleSignIn.instance;
       print('[Google Sign-In] ✓ GoogleSignIn instance obtained');
-      
+
       // Initialize with serverClientId (Web client ID from google-services.json)
       // This is REQUIRED on Android
-      print('[Google Sign-In] Step 3: Initializing GoogleSignIn with serverClientId');
-      print('[Google Sign-In] ServerClientId: 1048263640434-3updimfp5414dn6ubphntsstok4gjb1u.apps.googleusercontent.com');
+      print(
+          '[Google Sign-In] Step 3: Initializing GoogleSignIn with serverClientId');
+      print(
+          '[Google Sign-In] ServerClientId: 1048263640434-3updimfp5414dn6ubphntsstok4gjb1u.apps.googleusercontent.com');
       await googleSignIn.initialize(
-        serverClientId: '1048263640434-3updimfp5414dn6ubphntsstok4gjb1u.apps.googleusercontent.com',
+        serverClientId:
+            '1048263640434-3updimfp5414dn6ubphntsstok4gjb1u.apps.googleusercontent.com',
       );
       print('[Google Sign-In] ✓ GoogleSignIn initialized successfully');
 
       // Trigger the authentication flow
-      print('[Google Sign-In] Step 4: Starting authentication flow (this will show Google sign-in UI)');
+      print(
+          '[Google Sign-In] Step 4: Starting authentication flow (this will show Google sign-in UI)');
       final GoogleSignInAccount? googleUser = await googleSignIn.authenticate();
-      print('[Google Sign-In] Authentication flow completed'); 
+      print('[Google Sign-In] Authentication flow completed');
 
       if (googleUser == null) {
         // User cancelled the sign-in
@@ -392,6 +398,12 @@ class AuthNotifier extends Notifier<AuthState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
+      // On Android, Apple Sign-In requires web authentication setup
+      if (!kIsWeb && Platform.isAndroid) {
+        print(
+            '[Apple Sign-In] Android platform detected - using web authentication');
+      }
+
       // Check if Apple Sign In is available
       final isAvailable = await SignInWithApple.isAvailable();
       if (!isAvailable) {
@@ -407,22 +419,38 @@ class AuthNotifier extends Notifier<AuthState> {
       // Request Apple Sign In directly (without Firebase)
       print('[Apple Sign-In] Step 2: Requesting Apple authorization');
       print('[Apple Sign-In] This will show the Apple Sign In dialog...');
-      
+
       final AuthorizationCredentialAppleID appleCredential;
       try {
-        appleCredential = await SignInWithApple.getAppleIDCredential(
-          scopes: [
-            AppleIDAuthorizationScopes.email,
-            AppleIDAuthorizationScopes.fullName,
-          ],
-        );
+        // On Android, webAuthenticationOptions is required
+        if (!kIsWeb && Platform.isAndroid) {
+          appleCredential = await SignInWithApple.getAppleIDCredential(
+            scopes: [
+              AppleIDAuthorizationScopes.email,
+              AppleIDAuthorizationScopes.fullName,
+            ],
+            webAuthenticationOptions: WebAuthenticationOptions(
+              clientId: 'com.nextpital.prodoc', // Your app's bundle ID
+              redirectUri: Uri.parse(
+                  'https://nextpital.com/callbacks/sign_in_with_apple'),
+            ),
+          );
+        } else {
+          // iOS, macOS, or Web
+          appleCredential = await SignInWithApple.getAppleIDCredential(
+            scopes: [
+              AppleIDAuthorizationScopes.email,
+              AppleIDAuthorizationScopes.fullName,
+            ],
+          );
+        }
         print('[Apple Sign-In] ✓ Apple authorization received');
       } catch (e) {
         print('[Apple Sign-In] Error during Apple authorization: $e');
         final errorString = e.toString();
-        
+
         // Check if user cancelled
-        if (errorString.contains('canceled') || 
+        if (errorString.contains('canceled') ||
             errorString.contains('cancelled') ||
             errorString.contains('user_cancel')) {
           state = state.copyWith(
@@ -431,39 +459,42 @@ class AuthNotifier extends Notifier<AuthState> {
           );
           return;
         }
-        
+
         // Check for error 1000 - Sign in with Apple not configured
-        if (errorString.contains('error 1000') || 
+        if (errorString.contains('error 1000') ||
             errorString.contains('AuthorizationError error 1000')) {
           state = state.copyWith(
             isLoading: false,
-            error: 'Sign in with Apple is not configured. Please enable it in Xcode: Signing & Capabilities → Add "Sign in with Apple" capability.',
+            error:
+                'Sign in with Apple is not configured. Please enable it in Xcode: Signing & Capabilities → Add "Sign in with Apple" capability.',
           );
           return;
         }
-        
+
         // Check for other authorization errors
         if (errorString.contains('SignInWithAppleAuthorizationException') ||
             errorString.contains('AuthorizationError')) {
           state = state.copyWith(
             isLoading: false,
-            error: 'Apple sign-in failed. Please ensure Sign in with Apple is enabled in Xcode and your Apple Developer account.',
+            error:
+                'Apple sign-in failed. Please ensure Sign in with Apple is enabled in Xcode and your Apple Developer account.',
           );
           return;
         }
-        
+
         rethrow;
       }
 
       // Extract user data from Apple credential
       print('[Apple Sign-In] Step 3: Extracting user information');
-      print('[Apple Sign-In] Identity Token: ${appleCredential.identityToken != null ? "present" : "null"}');
+      print(
+          '[Apple Sign-In] Identity Token: ${appleCredential.identityToken != null ? "present" : "null"}');
       print('[Apple Sign-In] User ID: ${appleCredential.userIdentifier}');
-      
+
       // Get user information from Apple credential
       String name = '';
       String email = appleCredential.email ?? '';
-      
+
       // Apple may provide name only on first sign-in
       final givenName = appleCredential.givenName ?? '';
       final familyName = appleCredential.familyName ?? '';
@@ -471,7 +502,7 @@ class AuthNotifier extends Notifier<AuthState> {
 
       // Use user identifier if email is not provided (Apple allows users to hide their email)
       final String? userIdentifier = appleCredential.userIdentifier;
-      
+
       // Validate that we have at least user identifier
       if (userIdentifier == null || userIdentifier.isEmpty) {
         print('[Apple Sign-In] Error: User identifier is null or empty');
@@ -481,11 +512,10 @@ class AuthNotifier extends Notifier<AuthState> {
         );
         return;
       }
-      
-      final String finalEmail = email.isNotEmpty 
-          ? email 
-          : '$userIdentifier@privaterelay.appleid.com';
-      
+
+      final String finalEmail =
+          email.isNotEmpty ? email : '$userIdentifier@privaterelay.appleid.com';
+
       // Use display name or generate a placeholder
       final String finalName = name.isNotEmpty ? name : 'Apple User';
 
@@ -553,15 +583,18 @@ class AuthNotifier extends Notifier<AuthState> {
         errorMessage = 'Apple sign-in was cancelled';
       } else if (errorString.contains('error 1000') ||
           errorString.contains('authorizationerror error 1000')) {
-        errorMessage = 'Sign in with Apple is not configured. Please enable it in Xcode: Signing & Capabilities → Add "Sign in with Apple" capability.';
+        errorMessage =
+            'Sign in with Apple is not configured. Please enable it in Xcode: Signing & Capabilities → Add "Sign in with Apple" capability.';
       } else if (errorString.contains('not_handled') ||
           errorString.contains('not available')) {
         errorMessage = 'Apple Sign In is not available on this device';
-      } else if (errorString.contains('account_exists_with_different_credential')) {
+      } else if (errorString
+          .contains('account_exists_with_different_credential')) {
         errorMessage =
             'An account already exists with this email. Please use a different sign-in method.';
       } else if (errorString.contains('authorizationerror')) {
-        errorMessage = 'Apple sign-in configuration error. Please ensure Sign in with Apple is enabled in Xcode and your Apple Developer account.';
+        errorMessage =
+            'Apple sign-in configuration error. Please ensure Sign in with Apple is enabled in Xcode and your Apple Developer account.';
       } else {
         errorMessage = 'Apple sign-in failed: ${e.toString()}';
       }
@@ -638,4 +671,5 @@ class AuthNotifier extends Notifier<AuthState> {
 }
 
 // Auth Provider
-final authProvider = NotifierProvider<AuthNotifier, AuthState>(AuthNotifier.new);
+final authProvider =
+    NotifierProvider<AuthNotifier, AuthState>(AuthNotifier.new);

@@ -14,11 +14,27 @@
       },
       "oauth_client": [
         {
+          "client_id": "1048263640434-2psl760ebjh9g1v551nnbi2nd6nhaqdn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nextpital.prodoc",
+            "certificate_hash": "ec9f16e0f4704b61e67e685c9e61098c7a309e21"
+          }
+        },
+        {
           "client_id": "1048263640434-a900jmj626hm3sc1nvua492hvhp3njnl.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.nextpital.prodoc",
-            "certificate_hash": "adcd585c97c4264efcf33a55ef5e1ca45a47a70c959e30c4ef22567a05535d3d"
+            "certificate_hash": "6b12abe2898d7cbc87b8836878e64f10cedc8937"
+          }
+        },
+        {
+          "client_id": "1048263640434-mu5c858ilerpot7gon6jl04pf228lc25.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nextpital.prodoc",
+            "certificate_hash": "bacc94f0984fffde52add591880784f53bd21741"
           }
         },
         {
