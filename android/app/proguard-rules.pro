@@ -43,3 +43,12 @@
 # SLF4J - Suppress warnings for missing logger binder
 -dontwarn org.slf4j.impl.StaticLoggerBinder
 
+# Google ML Kit Text Recognition - Suppress warnings for optional language models
+-dontwarn com.google.mlkit.vision.text.chinese.ChineseTextRecognizerOptions$Builder
+-dontwarn com.google.mlkit.vision.text.chinese.ChineseTextRecognizerOptions
+-dontwarn com.google.mlkit.vision.text.devanagari.DevanagariTextRecognizerOptions$Builder
+-dontwarn com.google.mlkit.vision.text.devanagari.DevanagariTextRecognizerOptions
+-dontwarn com.google.mlkit.vision.text.japanese.JapaneseTextRecognizerOptions$Builder
+-dontwarn com.google.mlkit.vision.text.japanese.JapaneseTextRecognizerOptions
+-dontwarn com.google.mlkit.vision.text.korean.KoreanTextRecognizerOptions$Builder
+-dontwarn com.google.mlkit.vision.text.korean.KoreanTextRecognizerOptions

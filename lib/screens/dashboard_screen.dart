@@ -44,6 +44,7 @@ import '../data/models/subscription_model.dart';
 import '../widgets/subscription_expiration_dialog.dart';
 import 'cabinet_info_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../services/global_appointment_sync.dart';
 
 final dashboardFilterProvider = NotifierProvider<DashboardFilterNotifier, String>(DashboardFilterNotifier.new);
 
@@ -65,7 +66,8 @@ class DashboardScreen extends ConsumerStatefulWidget {
   ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+class _DashboardScreenState extends ConsumerState<DashboardScreen>
+    with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _hasCheckedReview = false;
   bool _hasCheckedSubscription = false;
@@ -73,11 +75,50 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   @override
   void initState() {
     super.initState();
+    // Listen to app lifecycle changes
+    WidgetsBinding.instance.addObserver(this);
+    
     // Check for review prompt after a short delay
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkReviewPrompt();
       _checkSubscriptionExpiration();
+      _startAppointmentSync();
     });
+  }
+
+  @override
+  void dispose() {
+    // Remove lifecycle observer
+    WidgetsBinding.instance.removeObserver(this);
+    // Stop appointment sync when leaving dashboard
+    ref.read(globalAppointmentSyncProvider).stopSync();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    
+    // When app comes to foreground, sync appointments
+    if (state == AppLifecycleState.resumed) {
+      final authState = ref.read(authProvider);
+      if (authState.isAuth == true) {
+        final syncService = ref.read(globalAppointmentSyncProvider);
+        // Force immediate sync when app comes to foreground
+        syncService.forceSync(ref);
+        debugPrint('[Dashboard] App resumed, forcing appointment sync');
+      }
+    }
+  }
+
+  /// Start global appointment sync when user is authenticated
+  void _startAppointmentSync() {
+    final authState = ref.read(authProvider);
+    if (authState.isAuth == true) {
+      final syncService = ref.read(globalAppointmentSyncProvider);
+      syncService.startSync(ref);
+      debugPrint('[Dashboard] Started global appointment sync');
+    }
   }
 
   List _safeList(dynamic value) {
@@ -251,11 +292,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final refresh = ref.watch(dashboardRefreshProvider);
 
     ref.listen<AuthState>(authProvider, (previous, next) {
+      final syncService = ref.read(globalAppointmentSyncProvider);
+      
       if (next.isAuth == false && previous?.isAuth == true) {
+        // User logged out - stop sync
+        syncService.stopSync();
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const LoginScreen()),
           (route) => false,
         );
+      } else if (next.isAuth == true && previous?.isAuth != true) {
+        // User logged in - start sync
+        syncService.startSync(ref);
+        debugPrint('[Dashboard] User logged in, started appointment sync');
       }
     });
 

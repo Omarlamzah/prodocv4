@@ -6,7 +6,8 @@ class ApiConstants {
 
   // Default/Master tenant URL for getting tenant list
   static const String masterBaseUrl = 'https://prodoc.ma/api/public/api';
-  static const String masterStorageUrl =  'https://dentairealami.nextpital.com/api/public';
+  static const String masterStorageUrl =
+      'https://dentairealami.nextpital.com/api/public';
 
   // Getters that return dynamic or master URL
   static String get baseUrl => _baseUrl ?? masterBaseUrl;
@@ -18,12 +19,9 @@ class ApiConstants {
   // Set tenant URLs dynamically
   static void setTenantUrls(String tenantUrl) {
     // Assuming tenantUrl is like: https://tenant.nextpital.com/api/public
-    _baseUrl = '$tenantUrl/api'; 
-   _storageBaseUrl = tenantUrl;
+    _baseUrl = '$tenantUrl/api';
+    _storageBaseUrl = tenantUrl;
   }
-
-
-  
 
   // Reset to master tenant
   static void resetToMaster() {
@@ -75,7 +73,8 @@ class ApiConstants {
   static String patient(int id) => '/patients/$id';
   static const String findPatients = '/patients/find';
   static String patientPhoto(int id) => '/patients/$id/photo';
-  static String generateFaceEmbedding(int id) => '/patients/$id/photo/generate-embedding';
+  static String generateFaceEmbedding(int id) =>
+      '/patients/$id/photo/generate-embedding';
 
   // Doctor Endpoints
   static const String doctors = '/doctors';
@@ -92,10 +91,15 @@ class ApiConstants {
   static const String prescriptionTemplates = '/prescription-templates';
   static const String prescriptionItems = '/prescription-items';
 
+  // Prescription Settings Endpoints
+  static const String ordonnanceSettings = '/ordonnance-settings';
+  static const String ordonnanceSettingsReset = '/ordonnance-settings/reset';
+
   // Tenant Website Endpoints
-  static const String tenantWebsiteConfig = '/tenant-website-config';
+  static const String tenantWebsiteConfig = '/tenant-website/mysite';
   static const String publicTenantWebsiteGetDefault =
       '/tenant-website/get_default_website';
+  static const String updateTenantWebsiteConfig = '/tenant-website/buildmysite';
 
   // Medical Record Endpoints
 
@@ -153,7 +157,6 @@ class ApiConstants {
   static String certificateGeneratePdf(int id) =>
       '/certificates/$id/generate-pdf';
   static String certificateDownload(int id) => '/certificates/$id/download';
-
 
   // OCR Endpoints
   static const String ocrMoroccanId = '/ocr/moroccan-id';

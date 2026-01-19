@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz;
+import 'notification_localization.dart';
+import '../screens/appointments_screen.dart';
+import '../main.dart';
 
 /// Service for handling WhatsApp-like notifications for chat messages
 class NotificationService {
@@ -18,6 +21,11 @@ class NotificationService {
   bool _initialized = false;
   int _messageNotificationId = 1000;
   int _emergencyNotificationId = 2000;
+  int _appointmentNotificationId = 3000;
+  int _prescriptionNotificationId = 4000;
+  int _adminNotificationId = 5000;
+  int _doctorNotificationId = 6000;
+  int _patientNotificationId = 7000;
 
   // Track message count per sender for grouping
   final Map<String, int> _messageCounts = {};
@@ -25,8 +33,20 @@ class NotificationService {
   // Notification channel IDs
   static const String _messageChannelId = 'chat_messages';
   static const String _emergencyChannelId = 'emergency_alerts';
+  static const String _appointmentChannelId = 'appointments';
+  static const String _prescriptionChannelId = 'prescriptions';
+  static const String _adminChannelId = 'admin_alerts';
+  static const String _doctorChannelId = 'doctor_alerts';
+  static const String _patientChannelId = 'patient_alerts';
+
+  // Notification channel names
   static const String _messageChannelName = 'Messages';
   static const String _emergencyChannelName = 'Urgences';
+  static const String _appointmentChannelName = 'Rendez-vous';
+  static const String _prescriptionChannelName = 'Ordonnances';
+  static const String _adminChannelName = 'Alertes Admin';
+  static const String _doctorChannelName = 'Alertes Médecin';
+  static const String _patientChannelName = 'Alertes Patient';
 
   /// Initialize the notification service
   Future<bool> initialize() async {
@@ -82,6 +102,11 @@ class NotificationService {
 
   /// Create Android notification channels
   Future<void> _createAndroidChannels() async {
+    final androidPlugin = _notifications.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+
+    if (androidPlugin == null) return;
+
     // Message channel - High importance (like WhatsApp)
     const AndroidNotificationChannel messageChannel =
         AndroidNotificationChannel(
@@ -92,7 +117,6 @@ class NotificationService {
       playSound: true,
       enableVibration: true,
       showBadge: true,
-      // Sound will use default system notification sound
     );
 
     // Emergency channel - Max importance
@@ -105,18 +129,73 @@ class NotificationService {
       playSound: true,
       enableVibration: true,
       showBadge: true,
-      // Sound will use default system notification sound
     );
 
-    await _notifications
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(messageChannel);
+    // Appointment channel - High importance
+    const AndroidNotificationChannel appointmentChannel =
+        AndroidNotificationChannel(
+      _appointmentChannelId,
+      _appointmentChannelName,
+      description: 'Notifications pour les rendez-vous',
+      importance: Importance.high,
+      playSound: true,
+      enableVibration: true,
+      showBadge: true,
+    );
 
-    await _notifications
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(emergencyChannel);
+    // Prescription channel - High importance
+    const AndroidNotificationChannel prescriptionChannel =
+        AndroidNotificationChannel(
+      _prescriptionChannelId,
+      _prescriptionChannelName,
+      description: 'Notifications pour les ordonnances',
+      importance: Importance.high,
+      playSound: true,
+      enableVibration: true,
+      showBadge: true,
+    );
+
+    // Admin channel - High importance
+    const AndroidNotificationChannel adminChannel = AndroidNotificationChannel(
+      _adminChannelId,
+      _adminChannelName,
+      description: 'Notifications pour les administrateurs',
+      importance: Importance.high,
+      playSound: true,
+      enableVibration: true,
+      showBadge: true,
+    );
+
+    // Doctor channel - High importance
+    const AndroidNotificationChannel doctorChannel = AndroidNotificationChannel(
+      _doctorChannelId,
+      _doctorChannelName,
+      description: 'Notifications pour les médecins',
+      importance: Importance.high,
+      playSound: true,
+      enableVibration: true,
+      showBadge: true,
+    );
+
+    // Patient channel - High importance
+    const AndroidNotificationChannel patientChannel =
+        AndroidNotificationChannel(
+      _patientChannelId,
+      _patientChannelName,
+      description: 'Notifications pour les patients',
+      importance: Importance.high,
+      playSound: true,
+      enableVibration: true,
+      showBadge: true,
+    );
+
+    await androidPlugin.createNotificationChannel(messageChannel);
+    await androidPlugin.createNotificationChannel(emergencyChannel);
+    await androidPlugin.createNotificationChannel(appointmentChannel);
+    await androidPlugin.createNotificationChannel(prescriptionChannel);
+    await androidPlugin.createNotificationChannel(adminChannel);
+    await androidPlugin.createNotificationChannel(doctorChannel);
+    await androidPlugin.createNotificationChannel(patientChannel);
   }
 
   /// Request iOS notification permissions
@@ -138,7 +217,63 @@ class NotificationService {
   void _onNotificationTapped(NotificationResponse response) {
     debugPrint(
         '[NotificationService] Notification tapped: ${response.payload}');
-    // You can add navigation logic here based on the payload
+
+    // Navigate based on notification type
+    _handleNotificationNavigation(response.payload);
+  }
+
+  /// Handle navigation when notification is tapped
+  void _handleNotificationNavigation(String? payload) {
+    if (payload == null || payload.isEmpty) {
+      debugPrint('[NotificationService] No payload, cannot navigate');
+      return;
+    }
+
+    try {
+      // Parse payload (format: {type: 'appointment_reminder', appointment_id: 123, ...})
+      // The payload is stored as a string representation of the map
+
+      // Check if it's an appointment-related notification
+      if (payload.contains('appointment') ||
+          payload.contains('appointment_id') ||
+          payload.contains('appointment_reminder') ||
+          payload.contains('appointment_soon') ||
+          payload.contains('appointment_confirmed')) {
+        _navigateToAppointmentsScreen();
+      } else if (payload.contains('prescription') ||
+          payload.contains('prescription_id')) {
+        // Could navigate to prescriptions screen in the future
+        debugPrint('[NotificationService] Prescription notification tapped');
+      } else if (payload.contains('patient_id')) {
+        // Could navigate to patient details in the future
+        debugPrint('[NotificationService] Patient notification tapped');
+      }
+    } catch (e) {
+      debugPrint(
+          '[NotificationService] Error handling notification navigation: $e');
+    }
+  }
+
+  /// Navigate to appointments screen
+  void _navigateToAppointmentsScreen() {
+    try {
+      // Use global navigator key to navigate from anywhere
+      final navigator = navigatorKey.currentState;
+      if (navigator != null) {
+        // Navigate to appointments screen
+        navigator.push(
+          MaterialPageRoute(
+            builder: (_) => const AppointmentsScreen(),
+          ),
+        );
+        debugPrint('[NotificationService] Navigating to appointments screen');
+      } else {
+        debugPrint(
+            '[NotificationService] Navigator not available, cannot navigate');
+      }
+    } catch (e) {
+      debugPrint('[NotificationService] Error navigating to appointments: $e');
+    }
   }
 
   /// Show a WhatsApp-like notification for a chat message
@@ -411,4 +546,640 @@ class NotificationService {
   int getBadgeCount() {
     return _messageCounts.values.fold(0, (sum, count) => sum + count);
   }
+
+  // ==================== APPOINTMENT NOTIFICATIONS ====================
+
+  /// Schedule an appointment reminder notification
+  Future<void> scheduleAppointmentReminder({
+    required int appointmentId,
+    required DateTime appointmentDate,
+    required String patientName,
+    required String doctorName,
+    String? serviceName,
+    Duration reminderBefore = const Duration(hours: 1),
+    Map<String, dynamic>? payload,
+  }) async {
+    if (!_initialized) {
+      await initialize();
+    }
+
+    try {
+      final reminderTime = appointmentDate.subtract(reminderBefore);
+
+      // Don't schedule if reminder time is in the past
+      if (reminderTime.isBefore(DateTime.now())) {
+        debugPrint(
+            '[NotificationService] Reminder time is in the past, skipping');
+        return;
+      }
+
+      final tzLocation = tz.local;
+      final scheduledDate = tz.TZDateTime.from(reminderTime, tzLocation);
+
+      final notificationId = _appointmentNotificationId + appointmentId;
+
+      // Get localized strings
+      final strings = await NotificationLocalization.getStrings();
+      final title = strings.appointmentReminderTitle;
+      final timeStr = _formatTime(appointmentDate);
+      final body =
+          strings.appointmentReminderBody(doctorName, serviceName, timeStr);
+
+      const androidDetails = AndroidNotificationDetails(
+        _appointmentChannelId,
+        _appointmentChannelName,
+        channelDescription: 'Notifications pour les rendez-vous',
+        importance: Importance.high,
+        priority: Priority.high,
+        showWhen: true,
+        enableVibration: true,
+        playSound: true,
+        icon: '@mipmap/ic_launcher',
+        color: Color(0xFF1976D2),
+        ledColor: Color(0xFF1976D2),
+        ledOnMs: 1000,
+        ledOffMs: 500,
+      );
+
+      const iosDetails = DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+        badgeNumber: 1,
+        threadIdentifier: 'appointments',
+        categoryIdentifier: 'APPOINTMENT_CATEGORY',
+      );
+
+      const notificationDetails = NotificationDetails(
+        android: androidDetails,
+        iOS: iosDetails,
+      );
+
+      await _notifications.zonedSchedule(
+        notificationId,
+        title,
+        body,
+        scheduledDate,
+        notificationDetails,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        payload: payload?.toString(),
+      );
+
+      debugPrint(
+          '[NotificationService] Appointment reminder scheduled: $appointmentId at $scheduledDate');
+    } catch (e) {
+      debugPrint(
+          '[NotificationService] Error scheduling appointment reminder: $e');
+    }
+  }
+
+  /// Show immediate appointment notification (new appointment created)
+  Future<void> showAppointmentNotification({
+    required String title,
+    required String message,
+    required int appointmentId,
+    String? patientName,
+    String? doctorName,
+    Map<String, dynamic>? payload,
+  }) async {
+    if (!_initialized) {
+      await initialize();
+    }
+
+    try {
+      final notificationId = _appointmentNotificationId + appointmentId;
+      final body = patientName != null && doctorName != null
+          ? '$message\n👤 Patient: $patientName\n👨‍⚕️ Médecin: $doctorName'
+          : message;
+
+      const androidDetails = AndroidNotificationDetails(
+        _appointmentChannelId,
+        _appointmentChannelName,
+        channelDescription: 'Notifications pour les rendez-vous',
+        importance: Importance.high,
+        priority: Priority.high,
+        showWhen: true,
+        enableVibration: true,
+        playSound: true,
+        icon: '@mipmap/ic_launcher',
+        color: Color(0xFF1976D2),
+        ledColor: Color(0xFF1976D2),
+        ledOnMs: 1000,
+        ledOffMs: 500,
+        styleInformation: BigTextStyleInformation(''),
+      );
+
+      const iosDetails = DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+        badgeNumber: 1,
+        threadIdentifier: 'appointments',
+        categoryIdentifier: 'APPOINTMENT_CATEGORY',
+      );
+
+      const notificationDetails = NotificationDetails(
+        android: androidDetails,
+        iOS: iosDetails,
+      );
+
+      await _notifications.show(
+        notificationId,
+        '📅 $title',
+        body,
+        notificationDetails,
+        payload: payload?.toString(),
+      );
+
+      debugPrint(
+          '[NotificationService] Appointment notification shown: $title');
+    } catch (e) {
+      debugPrint(
+          '[NotificationService] Error showing appointment notification: $e');
+    }
+  }
+
+  /// Cancel appointment reminder
+  Future<void> cancelAppointmentReminder(int appointmentId) async {
+    try {
+      final notificationId = _appointmentNotificationId + appointmentId;
+      await _notifications.cancel(notificationId);
+      debugPrint(
+          '[NotificationService] Appointment reminder cancelled: $appointmentId');
+    } catch (e) {
+      debugPrint(
+          '[NotificationService] Error cancelling appointment reminder: $e');
+    }
+  }
+
+  // ==================== PRESCRIPTION NOTIFICATIONS ====================
+
+  /// Show prescription ready notification
+  Future<void> showPrescriptionReadyNotification({
+    required String patientName,
+    required int prescriptionId,
+    String? doctorName,
+    Map<String, dynamic>? payload,
+  }) async {
+    if (!_initialized) {
+      await initialize();
+    }
+
+    try {
+      final notificationId = _prescriptionNotificationId + prescriptionId;
+
+      // Get localized strings
+      final strings = await NotificationLocalization.getStrings();
+      final title = strings.prescriptionReadyTitle;
+      final body = strings.prescriptionReadyMessage(doctorName);
+
+      const androidDetails = AndroidNotificationDetails(
+        _prescriptionChannelId,
+        _prescriptionChannelName,
+        channelDescription: 'Notifications pour les ordonnances',
+        importance: Importance.high,
+        priority: Priority.high,
+        showWhen: true,
+        enableVibration: true,
+        playSound: true,
+        icon: '@mipmap/ic_launcher',
+        color: Color(0xFF4CAF50),
+        ledColor: Color(0xFF4CAF50),
+        ledOnMs: 1000,
+        ledOffMs: 500,
+      );
+
+      const iosDetails = DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+        badgeNumber: 1,
+        threadIdentifier: 'prescriptions',
+        categoryIdentifier: 'PRESCRIPTION_CATEGORY',
+      );
+
+      const notificationDetails = NotificationDetails(
+        android: androidDetails,
+        iOS: iosDetails,
+      );
+
+      await _notifications.show(
+        notificationId,
+        title,
+        body,
+        notificationDetails,
+        payload: payload?.toString(),
+      );
+
+      debugPrint(
+          '[NotificationService] Prescription ready notification shown: $prescriptionId');
+    } catch (e) {
+      debugPrint(
+          '[NotificationService] Error showing prescription notification: $e');
+    }
+  }
+
+  /// Schedule medication reminder
+  Future<void> scheduleMedicationReminder({
+    required int reminderId,
+    required String medicationName,
+    required String dosage,
+    required DateTime reminderTime,
+    required int prescriptionId,
+    Map<String, dynamic>? payload,
+  }) async {
+    if (!_initialized) {
+      await initialize();
+    }
+
+    try {
+      // Don't schedule if reminder time is in the past
+      if (reminderTime.isBefore(DateTime.now())) {
+        debugPrint(
+            '[NotificationService] Reminder time is in the past, skipping');
+        return;
+      }
+
+      final tzLocation = tz.local;
+      final scheduledDate = tz.TZDateTime.from(reminderTime, tzLocation);
+
+      final notificationId = _prescriptionNotificationId + reminderId;
+
+      // Get localized strings
+      final strings = await NotificationLocalization.getStrings();
+      final title = strings.medicationReminderTitle;
+      final body = strings.medicationReminderMessage(medicationName, dosage);
+
+      const androidDetails = AndroidNotificationDetails(
+        _prescriptionChannelId,
+        _prescriptionChannelName,
+        channelDescription: 'Notifications pour les ordonnances',
+        importance: Importance.high,
+        priority: Priority.high,
+        showWhen: true,
+        enableVibration: true,
+        playSound: true,
+        icon: '@mipmap/ic_launcher',
+        color: Color(0xFF4CAF50),
+        ledColor: Color(0xFF4CAF50),
+        ledOnMs: 1000,
+        ledOffMs: 500,
+      );
+
+      const iosDetails = DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+        badgeNumber: 1,
+        threadIdentifier: 'prescriptions',
+        categoryIdentifier: 'PRESCRIPTION_CATEGORY',
+      );
+
+      const notificationDetails = NotificationDetails(
+        android: androidDetails,
+        iOS: iosDetails,
+      );
+
+      await _notifications.zonedSchedule(
+        notificationId,
+        title,
+        body,
+        scheduledDate,
+        notificationDetails,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        payload: payload?.toString(),
+      );
+
+      debugPrint(
+          '[NotificationService] Medication reminder scheduled: $medicationName at $scheduledDate');
+    } catch (e) {
+      debugPrint(
+          '[NotificationService] Error scheduling medication reminder: $e');
+    }
+  }
+
+  /// Cancel medication reminder
+  Future<void> cancelMedicationReminder(int reminderId) async {
+    try {
+      final notificationId = _prescriptionNotificationId + reminderId;
+      await _notifications.cancel(notificationId);
+      debugPrint(
+          '[NotificationService] Medication reminder cancelled: $reminderId');
+    } catch (e) {
+      debugPrint(
+          '[NotificationService] Error cancelling medication reminder: $e');
+    }
+  }
+
+  // ==================== ADMIN NOTIFICATIONS ====================
+
+  /// Show admin notification (system alerts, new registrations, etc.)
+  Future<void> showAdminNotification({
+    required String title,
+    required String message,
+    required int notificationId,
+    NotificationType type = NotificationType.info,
+    Map<String, dynamic>? payload,
+  }) async {
+    if (!_initialized) {
+      await initialize();
+    }
+
+    try {
+      final id = _adminNotificationId + notificationId;
+      final emoji = _getNotificationTypeEmoji(type);
+      final finalTitle = '$emoji $title';
+
+      final color = _getNotificationTypeColor(type);
+
+      final androidDetails = AndroidNotificationDetails(
+        _adminChannelId,
+        _adminChannelName,
+        channelDescription: 'Notifications pour les administrateurs',
+        importance:
+            type == NotificationType.urgent ? Importance.max : Importance.high,
+        priority:
+            type == NotificationType.urgent ? Priority.max : Priority.high,
+        showWhen: true,
+        enableVibration: true,
+        playSound: true,
+        icon: '@mipmap/ic_launcher',
+        color: color,
+        ledColor: color,
+        ledOnMs: 1000,
+        ledOffMs: 500,
+        styleInformation: BigTextStyleInformation(message),
+      );
+
+      final iosDetails = DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+        badgeNumber: 1,
+        threadIdentifier: 'admin_alerts',
+        categoryIdentifier: 'ADMIN_CATEGORY',
+        interruptionLevel: type == NotificationType.urgent
+            ? InterruptionLevel.critical
+            : InterruptionLevel.active,
+      );
+
+      final notificationDetails = NotificationDetails(
+        android: androidDetails,
+        iOS: iosDetails,
+      );
+
+      await _notifications.show(
+        id,
+        finalTitle,
+        message,
+        notificationDetails,
+        payload: payload?.toString(),
+      );
+
+      debugPrint('[NotificationService] Admin notification shown: $title');
+    } catch (e) {
+      debugPrint('[NotificationService] Error showing admin notification: $e');
+    }
+  }
+
+  // ==================== DOCTOR NOTIFICATIONS ====================
+
+  /// Show doctor notification (new appointment, patient waiting, etc.)
+  Future<void> showDoctorNotification({
+    required String title,
+    required String message,
+    required int notificationId,
+    NotificationType type = NotificationType.info,
+    String? patientName,
+    Map<String, dynamic>? payload,
+  }) async {
+    if (!_initialized) {
+      await initialize();
+    }
+
+    try {
+      final id = _doctorNotificationId + notificationId;
+      final emoji = _getNotificationTypeEmoji(type);
+      final finalTitle = '$emoji $title';
+
+      // Get localized strings for patient label
+      final strings = await NotificationLocalization.getStrings();
+      final body = patientName != null
+          ? '$message\n${strings.patientLabel(patientName)}'
+          : message;
+
+      final color = _getNotificationTypeColor(type);
+
+      final androidDetails = AndroidNotificationDetails(
+        _doctorChannelId,
+        _doctorChannelName,
+        channelDescription: 'Notifications pour les médecins',
+        importance:
+            type == NotificationType.urgent ? Importance.max : Importance.high,
+        priority:
+            type == NotificationType.urgent ? Priority.max : Priority.high,
+        showWhen: true,
+        enableVibration: true,
+        playSound: true,
+        icon: '@mipmap/ic_launcher',
+        color: color,
+        ledColor: color,
+        ledOnMs: 1000,
+        ledOffMs: 500,
+        styleInformation: BigTextStyleInformation(body),
+      );
+
+      final iosDetails = DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+        badgeNumber: 1,
+        threadIdentifier: 'doctor_alerts',
+        categoryIdentifier: 'DOCTOR_CATEGORY',
+        interruptionLevel: type == NotificationType.urgent
+            ? InterruptionLevel.critical
+            : InterruptionLevel.active,
+      );
+
+      final notificationDetails = NotificationDetails(
+        android: androidDetails,
+        iOS: iosDetails,
+      );
+
+      await _notifications.show(
+        id,
+        finalTitle,
+        body,
+        notificationDetails,
+        payload: payload?.toString(),
+      );
+
+      debugPrint('[NotificationService] Doctor notification shown: $title');
+    } catch (e) {
+      debugPrint('[NotificationService] Error showing doctor notification: $e');
+    }
+  }
+
+  // ==================== PATIENT NOTIFICATIONS ====================
+
+  /// Show patient notification (appointment confirmations, reminders, etc.)
+  Future<void> showPatientNotification({
+    required String title,
+    required String message,
+    required int notificationId,
+    NotificationType type = NotificationType.info,
+    String? doctorName,
+    Map<String, dynamic>? payload,
+  }) async {
+    if (!_initialized) {
+      await initialize();
+    }
+
+    try {
+      final id = _patientNotificationId + notificationId;
+      final emoji = _getNotificationTypeEmoji(type);
+      final finalTitle = '$emoji $title';
+
+      // Get localized strings for doctor label
+      final strings = await NotificationLocalization.getStrings();
+      final body = doctorName != null
+          ? '$message\n${strings.doctorLabel(doctorName)}'
+          : message;
+
+      final color = _getNotificationTypeColor(type);
+
+      final androidDetails = AndroidNotificationDetails(
+        _patientChannelId,
+        _patientChannelName,
+        channelDescription: 'Notifications pour les patients',
+        importance:
+            type == NotificationType.urgent ? Importance.max : Importance.high,
+        priority:
+            type == NotificationType.urgent ? Priority.max : Priority.high,
+        showWhen: true,
+        enableVibration: true,
+        playSound: true,
+        icon: '@mipmap/ic_launcher',
+        color: color,
+        ledColor: color,
+        ledOnMs: 1000,
+        ledOffMs: 500,
+        styleInformation: BigTextStyleInformation(body),
+      );
+
+      final iosDetails = DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+        badgeNumber: 1,
+        threadIdentifier: 'patient_alerts',
+        categoryIdentifier: 'PATIENT_CATEGORY',
+        interruptionLevel: type == NotificationType.urgent
+            ? InterruptionLevel.critical
+            : InterruptionLevel.active,
+      );
+
+      final notificationDetails = NotificationDetails(
+        android: androidDetails,
+        iOS: iosDetails,
+      );
+
+      await _notifications.show(
+        id,
+        finalTitle,
+        body,
+        notificationDetails,
+        payload: payload?.toString(),
+      );
+
+      debugPrint('[NotificationService] Patient notification shown: $title');
+    } catch (e) {
+      debugPrint(
+          '[NotificationService] Error showing patient notification: $e');
+    }
+  }
+
+  // ==================== HELPER METHODS ====================
+
+  /// Get notification type emoji
+  String _getNotificationTypeEmoji(NotificationType type) {
+    switch (type) {
+      case NotificationType.urgent:
+        return '🚨';
+      case NotificationType.warning:
+        return '⚠️';
+      case NotificationType.success:
+        return '✅';
+      case NotificationType.info:
+        return 'ℹ️';
+    }
+  }
+
+  /// Get notification type color
+  Color _getNotificationTypeColor(NotificationType type) {
+    switch (type) {
+      case NotificationType.urgent:
+        return Colors.red;
+      case NotificationType.warning:
+        return Colors.orange;
+      case NotificationType.success:
+        return Colors.green;
+      case NotificationType.info:
+        return Colors.blue;
+    }
+  }
+
+  /// Format time for display
+  String _formatTime(DateTime dateTime) {
+    final hour = dateTime.hour.toString().padLeft(2, '0');
+    final minute = dateTime.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
+  }
+
+  /// Get all pending notifications
+  Future<List<PendingNotificationRequest>> getPendingNotifications() async {
+    return await _notifications.pendingNotificationRequests();
+  }
+
+  /// Cancel all appointment reminders
+  Future<void> cancelAllAppointmentReminders() async {
+    try {
+      final pending = await getPendingNotifications();
+      for (final notification in pending) {
+        if (notification.id >= _appointmentNotificationId &&
+            notification.id < _prescriptionNotificationId) {
+          await _notifications.cancel(notification.id);
+        }
+      }
+      debugPrint('[NotificationService] All appointment reminders cancelled');
+    } catch (e) {
+      debugPrint(
+          '[NotificationService] Error cancelling all appointment reminders: $e');
+    }
+  }
+
+  /// Cancel all medication reminders
+  Future<void> cancelAllMedicationReminders() async {
+    try {
+      final pending = await getPendingNotifications();
+      for (final notification in pending) {
+        if (notification.id >= _prescriptionNotificationId &&
+            notification.id < _adminNotificationId) {
+          await _notifications.cancel(notification.id);
+        }
+      }
+      debugPrint('[NotificationService] All medication reminders cancelled');
+    } catch (e) {
+      debugPrint(
+          '[NotificationService] Error cancelling all medication reminders: $e');
+    }
+  }
+}
+
+/// Notification types for different priority levels
+enum NotificationType {
+  info,
+  success,
+  warning,
+  urgent,
 }

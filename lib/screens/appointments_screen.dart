@@ -376,6 +376,7 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen>
     final authState = ref.watch(authProvider);
     final appointmentsAsync = ref.watch(appointmentsProvider(_currentParams()));
     final servicesAsync = ref.watch(servicesProvider);
+
     final size = MediaQuery.of(context).size;
     final isTablet = size.width >= 600 && size.width < 900;
     final isDesktop = size.width >= 900;
@@ -1991,6 +1992,8 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen>
 
   Widget _buildAppointmentsTable(List<AppointmentModel> appointments) {
     final localizations = AppLocalizations.of(context);
+    final authState = ref.read(authProvider);
+    final user = authState.user;
     return SliverToBoxAdapter(
       child: Container(
         decoration: BoxDecoration(
@@ -2086,6 +2089,14 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen>
               final priorityColor = _getPriorityColor(appointment.priority);
               final isSelected = appointment.id != null &&
                   _selectedAppointments.contains(appointment.id);
+
+              // Only staff (admin/doctor/receptionist) can see edit and WhatsApp buttons
+              // Patients should NOT see these options
+              final canEditAsStaff = user != null &&
+                  (user.isAdmin == 1 ||
+                      user.isDoctor == 1 ||
+                      user.isReceptionist == 1);
+
               return DataRow(
                 selected: isSelected,
                 onSelectChanged: (selected) {
@@ -2143,54 +2154,58 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen>
                             ],
                           ),
                         ),
-                        PopupMenuItem(
-                          value: 'edit',
-                          child: Row(
-                            children: [
-                              const Icon(Icons.edit, size: 18),
-                              const SizedBox(width: 8),
-                              Text(localizations?.edit ?? 'Edit'),
-                            ],
-                          ),
-                        ),
-                        PopupMenuItem(
-                          value: 'completed',
-                          child: Row(
-                            children: [
-                              const Icon(Icons.check_circle,
-                                  size: 18, color: Color(0xFF388E3C)),
-                              const SizedBox(width: 8),
-                              Text(localizations?.markAsCompleted ??
-                                  'Mark as Completed'),
-                            ],
-                          ),
-                        ),
-                        PopupMenuItem(
-                          value: 'cancelled',
-                          child: Row(
-                            children: [
-                              const Icon(Icons.cancel,
-                                  size: 18, color: Color(0xFFD32F2F)),
-                              const SizedBox(width: 8),
-                              Text(localizations?.cancel ?? 'Cancel'),
-                            ],
-                          ),
-                        ),
-                        if (appointment.status != 'completed' &&
-                            appointment.status != 'cancelled' &&
-                            appointment.id != null)
+                        // Show Edit, status update, and WhatsApp options ONLY for staff (not for patients)
+                        if (canEditAsStaff) ...[
                           PopupMenuItem(
-                            value: 'reminder',
+                            value: 'edit',
                             child: Row(
                               children: [
-                                const Icon(Icons.message_rounded,
-                                    size: 18, color: Color(0xFF25D366)),
+                                const Icon(Icons.edit, size: 18),
                                 const SizedBox(width: 8),
-                                Text(localizations?.sendWhatsAppReminder ??
-                                    'Send WhatsApp Reminder'),
+                                Text(localizations?.edit ?? 'Edit'),
                               ],
                             ),
                           ),
+                          PopupMenuItem(
+                            value: 'completed',
+                            child: Row(
+                              children: [
+                                const Icon(Icons.check_circle,
+                                    size: 18, color: Color(0xFF388E3C)),
+                                const SizedBox(width: 8),
+                                Text(localizations?.markAsCompleted ??
+                                    'Mark as Completed'),
+                              ],
+                            ),
+                          ),
+                          PopupMenuItem(
+                            value: 'cancelled',
+                            child: Row(
+                              children: [
+                                const Icon(Icons.cancel,
+                                    size: 18, color: Color(0xFFD32F2F)),
+                                const SizedBox(width: 8),
+                                Text(localizations?.cancel ?? 'Cancel'),
+                              ],
+                            ),
+                          ),
+                          // Show WhatsApp option only for staff
+                          if (appointment.status != 'completed' &&
+                              appointment.status != 'cancelled' &&
+                              appointment.id != null)
+                            PopupMenuItem(
+                              value: 'reminder',
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.message_rounded,
+                                      size: 18, color: Color(0xFF25D366)),
+                                  const SizedBox(width: 8),
+                                  Text(localizations?.sendWhatsAppReminder ??
+                                      'Send WhatsApp Reminder'),
+                                ],
+                              ),
+                            ),
+                        ],
                         PopupMenuItem(
                           value: 'prescriptions',
                           child: Row(
@@ -2234,6 +2249,14 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen>
     int index,
   ) {
     final localizations = AppLocalizations.of(context);
+    final authState = ref.read(authProvider);
+    final user = authState.user;
+
+    // Only staff (admin/doctor/receptionist) can see edit and WhatsApp buttons
+    // Patients should NOT see these options
+    final canEditAsStaff = user != null &&
+        (user.isAdmin == 1 || user.isDoctor == 1 || user.isReceptionist == 1);
+
     final appointmentDate = _parseAppointmentDate(appointment);
     final dateLabel = appointmentDate != null
         ? _getDateFormatter().format(appointmentDate)
@@ -2394,33 +2417,36 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen>
                           label: localizations?.details ?? 'Details',
                           onTap: () => _showDetailsSheet(appointment),
                         ),
-                        const SizedBox(width: 6),
-                        _buildActionButton(
-                          icon: Icons.edit_outlined,
-                          label: localizations?.edit ?? 'Edit',
-                          onTap: () => _handleEditAppointment(appointment),
-                        ),
-                        const SizedBox(width: 6),
-                        _buildActionButton(
-                          icon: Icons.receipt_long_rounded,
-                          label: localizations?.invoice ?? 'Invoice',
-                          onTap: () => _showComingSoon(
-                              context,
-                              'Billing coming soon.'
-                              'Billing coming soon.'),
-                          color: const Color(0xFF388E3C), // Suggested green
-                        ),
-                        if (appointment.status != 'completed' &&
-                            appointment.status != 'cancelled' &&
-                            appointment.id != null) ...[
+                        // Show Edit, Invoice, and WhatsApp buttons ONLY for staff (not for patients)
+                        if (canEditAsStaff) ...[
                           const SizedBox(width: 6),
                           _buildActionButton(
-                            icon: Icons.message_rounded,
-                            label: localizations?.whatsApp ?? 'WhatsApp',
-                            onTap: () =>
-                                _handleSendWhatsAppReminder(appointment),
-                            color: const Color(0xFF25D366), // WhatsApp green
+                            icon: Icons.edit_outlined,
+                            label: localizations?.edit ?? 'Edit',
+                            onTap: () => _handleEditAppointment(appointment),
                           ),
+                          const SizedBox(width: 6),
+                          _buildActionButton(
+                            icon: Icons.receipt_long_rounded,
+                            label: localizations?.invoice ?? 'Invoice',
+                            onTap: () => _showComingSoon(
+                                context,
+                                'Billing coming soon.'
+                                'Billing coming soon.'),
+                            color: const Color(0xFF388E3C), // Suggested green
+                          ),
+                          if (appointment.status != 'completed' &&
+                              appointment.status != 'cancelled' &&
+                              appointment.id != null) ...[
+                            const SizedBox(width: 6),
+                            _buildActionButton(
+                              icon: Icons.message_rounded,
+                              label: localizations?.whatsApp ?? 'WhatsApp',
+                              onTap: () =>
+                                  _handleSendWhatsAppReminder(appointment),
+                              color: const Color(0xFF25D366), // WhatsApp green
+                            ),
+                          ],
                         ],
                       ],
                     ),

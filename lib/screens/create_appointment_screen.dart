@@ -31,6 +31,9 @@ import '../l10n/app_localizations.dart';
 import '../providers/locale_providers.dart';
 import '../core/config/api_constants.dart';
 import '../providers/api_providers.dart';
+import '../services/appointment_notification_helper.dart';
+import '../providers/auth_providers.dart';
+import '../data/models/appointment_response_model.dart';
 
 enum AppointmentStep { check, select, newPatient, appointment }
 
@@ -1357,6 +1360,8 @@ class _CreateAppointmentScreenState
 
     result.when(
       success: (response) {
+        // Schedule local notification reminder 1 hour before appointment
+        _scheduleAppointmentReminder(response);
         _showSuccessDialog(response);
       },
       failure: (message) {
@@ -1366,6 +1371,83 @@ class _CreateAppointmentScreenState
         _showErrorDialog(message);
       },
     );
+  }
+
+  /// Schedule local notification reminder 1 hour before appointment
+  /// Or show immediate notification if appointment is less than 1 hour away
+  Future<void> _scheduleAppointmentReminder(
+      AppointmentResponseModel response) async {
+    try {
+      final helper = AppointmentNotificationHelper();
+      final appointment = response.appointment;
+
+      // Check if appointment is less than 1 hour away
+      if (appointment.appointmentDate != null &&
+          appointment.appointmentTime != null) {
+        final appointmentDateTime = _parseAppointmentDateTime(
+          appointment.appointmentDate!,
+          appointment.appointmentTime!,
+        );
+
+        if (appointmentDateTime != null) {
+          final timeUntil = appointmentDateTime.difference(DateTime.now());
+
+          // If less than 1 hour away, show immediate notification
+          if (timeUntil.inHours < 1 && timeUntil.inMinutes > 0) {
+            await helper.notifyPatientAppointmentSoon(appointment);
+          } else if (timeUntil.inHours >= 1) {
+            // If more than 1 hour away, schedule reminder
+            await helper.scheduleAppointmentReminder(
+              appointment: appointment,
+              reminderBefore: const Duration(hours: 1),
+            );
+          }
+        }
+      }
+
+      // Also notify doctor about new appointment (if current user is admin/receptionist)
+      final authState = ref.read(authProvider);
+      if (authState.user?.isAdmin == 1 || authState.user?.isReceptionist == 1) {
+        await helper.notifyDoctorNewAppointment(appointment);
+      }
+
+      // Notify patient if they have an account (confirmation)
+      if (appointment.patient?.user != null) {
+        await helper.notifyPatientAppointmentConfirmed(appointment);
+      }
+    } catch (e) {
+      debugPrint('[CreateAppointmentScreen] Error scheduling reminder: $e');
+      // Don't show error to user, just log it
+    }
+  }
+
+  /// Parse appointment date and time strings into DateTime
+  DateTime? _parseAppointmentDateTime(String dateStr, String timeStr) {
+    try {
+      // Parse date (format: yyyy-MM-dd)
+      final dateParts = dateStr.split('-');
+      if (dateParts.length != 3) {
+        return null;
+      }
+
+      final year = int.parse(dateParts[0]);
+      final month = int.parse(dateParts[1]);
+      final day = int.parse(dateParts[2]);
+
+      // Parse time (format: HH:mm or HH:mm:ss)
+      final timeParts = timeStr.split(':');
+      if (timeParts.length < 2) {
+        return null;
+      }
+
+      final hour = int.parse(timeParts[0]);
+      final minute = int.parse(timeParts[1]);
+
+      return DateTime(year, month, day, hour, minute);
+    } catch (e) {
+      debugPrint('[CreateAppointmentScreen] Error parsing date/time: $e');
+      return null;
+    }
   }
 
   void _showSuccessDialog(dynamic response) {
@@ -2359,10 +2441,12 @@ class _CreateAppointmentScreenState
                                     final path = cleanPath.startsWith('/')
                                         ? cleanPath.substring(1)
                                         : cleanPath;
-                                    final cleanRelPath = path.startsWith('storage/')
-                                        ? path.substring(8)
-                                        : path;
-                                    faceImageUrl = '${ApiConstants.storageBaseUrl}/storage/$cleanRelPath';
+                                    final cleanRelPath =
+                                        path.startsWith('storage/')
+                                            ? path.substring(8)
+                                            : path;
+                                    faceImageUrl =
+                                        '${ApiConstants.storageBaseUrl}/storage/$cleanRelPath';
                                   }
 
                                   return Image.network(
@@ -2376,7 +2460,8 @@ class _CreateAppointmentScreenState
                                         height: 120,
                                         decoration: BoxDecoration(
                                           color: Colors.grey[200],
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
                                         ),
                                         child: Icon(
                                           Icons.face_rounded,
@@ -2385,20 +2470,26 @@ class _CreateAppointmentScreenState
                                         ),
                                       );
                                     },
-                                    loadingBuilder: (context, child, loadingProgress) {
+                                    loadingBuilder:
+                                        (context, child, loadingProgress) {
                                       if (loadingProgress == null) return child;
                                       return Container(
                                         width: 120,
                                         height: 120,
                                         decoration: BoxDecoration(
                                           color: Colors.grey[200],
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
                                         ),
                                         child: Center(
                                           child: CircularProgressIndicator(
-                                            value: loadingProgress.expectedTotalBytes != null
-                                                ? loadingProgress.cumulativeBytesLoaded /
-                                                    loadingProgress.expectedTotalBytes!
+                                            value: loadingProgress
+                                                        .expectedTotalBytes !=
+                                                    null
+                                                ? loadingProgress
+                                                        .cumulativeBytesLoaded /
+                                                    loadingProgress
+                                                        .expectedTotalBytes!
                                                 : null,
                                           ),
                                         ),
@@ -3555,18 +3646,18 @@ class _CreateAppointmentScreenState
     // If we have a photo URL, use it
     if (photoUrl != null && photoUrl.toString().isNotEmpty) {
       // Aggressively clean the path - remove ALL whitespace and control characters
-      final String cleanPath = photoUrl.toString().replaceAll(RegExp(r'\s+'), '').trim();
+      final String cleanPath =
+          photoUrl.toString().replaceAll(RegExp(r'\s+'), '').trim();
       final String finalPhotoUrl;
 
-      if (!cleanPath.startsWith('http://') && !cleanPath.startsWith('https://')) {
+      if (!cleanPath.startsWith('http://') &&
+          !cleanPath.startsWith('https://')) {
         // Remove leading slash if present
-        final String path = cleanPath.startsWith('/')
-            ? cleanPath.substring(1)
-            : cleanPath;
+        final String path =
+            cleanPath.startsWith('/') ? cleanPath.substring(1) : cleanPath;
         // Remove 'storage/' prefix if present
-        final String cleanRelPath = path.startsWith('storage/')
-            ? path.substring(8)
-            : path;
+        final String cleanRelPath =
+            path.startsWith('storage/') ? path.substring(8) : path;
         finalPhotoUrl = '${ApiConstants.storageBaseUrl}/storage/$cleanRelPath';
       } else {
         finalPhotoUrl = cleanPath;
@@ -3637,15 +3728,14 @@ class _CreateAppointmentScreenState
       // Aggressively clean the path
       final String cleanPath = photoUrl.replaceAll(RegExp(r'\s+'), '').trim();
 
-      if (!cleanPath.startsWith('http://') && !cleanPath.startsWith('https://')) {
+      if (!cleanPath.startsWith('http://') &&
+          !cleanPath.startsWith('https://')) {
         // Remove leading slash if present
-        final String path = cleanPath.startsWith('/')
-            ? cleanPath.substring(1)
-            : cleanPath;
+        final String path =
+            cleanPath.startsWith('/') ? cleanPath.substring(1) : cleanPath;
         // Remove 'storage/' prefix if present
-        final String cleanRelPath = path.startsWith('storage/')
-            ? path.substring(8)
-            : path;
+        final String cleanRelPath =
+            path.startsWith('storage/') ? path.substring(8) : path;
         photoUrl = '${ApiConstants.storageBaseUrl}/storage/$cleanRelPath';
       } else {
         photoUrl = cleanPath;

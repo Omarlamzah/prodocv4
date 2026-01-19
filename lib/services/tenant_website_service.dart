@@ -42,4 +42,24 @@ class TenantWebsiteService {
       return Failure('Failed to fetch default tenant website: $e');
     }
   }
+
+  // Update tenant website config (requires auth, admin or doctor only)
+  // Uses POST /tenant-website/buildmysite as per Laravel API
+  Future<Result<TenantWebsiteModel>> updateTenantWebsiteConfig(
+      Map<String, dynamic> data) async {
+    try {
+      final responseData = await apiClient.post(
+        ApiConstants.updateTenantWebsiteConfig,
+        body: data,
+        requireAuth: true,
+      );
+
+      final website = TenantWebsiteModel.fromJson(responseData);
+      return Success(website);
+    } on ApiException catch (e) {
+      return Failure(e.message);
+    } catch (e) {
+      return Failure('Failed to update tenant website config: $e');
+    }
+  }
 }

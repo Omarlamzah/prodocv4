@@ -8,6 +8,7 @@ import '../services/doctor_service.dart';
 import '../services/service_service.dart';
 import '../services/prescription_service.dart';
 import '../services/tenant_website_service.dart';
+import '../services/ordonnance_setting_service.dart';
 import '../services/medical_record_service.dart';
 import '../services/invoice_service.dart';
 import '../services/communication_service.dart';
@@ -64,6 +65,12 @@ final prescriptionServiceProvider = Provider<PrescriptionService>((ref) {
 final tenantWebsiteServiceProvider = Provider<TenantWebsiteService>((ref) {
   final apiClient = ref.watch(apiClientProvider);
   return TenantWebsiteService(apiClient: apiClient);
+});
+
+final ordonnanceSettingServiceProvider =
+    Provider<OrdonnanceSettingService>((ref) {
+  final apiClient = ref.watch(apiClientProvider);
+  return OrdonnanceSettingService(apiClient: apiClient);
 });
 
 final medicalRecordServiceProvider = Provider<MedicalRecordService>((ref) {

@@ -14,6 +14,7 @@ import '../screens/create_prescription_screen.dart';
 import '../screens/create_medical_record_screen.dart';
 import '../screens/dashboard_screen.dart';
 import '../screens/cabinet_info_screen.dart';
+import '../screens/prescription_settings_screen.dart';
 import '../screens/patients_screen.dart';
 import '../screens/medical_records_screen.dart';
 import '../screens/doctor_calendar_screen.dart';
@@ -673,6 +674,26 @@ class AppDrawer extends ConsumerWidget {
                       // TODO: Navigate to settings screen
                     },
                   ).animate().fadeIn(delay: 810.ms).slideX(begin: -0.1),
+
+                  if (user?.isAdmin == 1 ||
+                      user?.isDoctor == 1 ||
+                      user?.isReceptionist == 1)
+                    _buildModernDrawerItem(
+                      context,
+                      icon: Icons.description_rounded,
+                      title: 'Paramètres Ordonnance',
+                      subtitle: 'Configurer les ordonnances',
+                      color: Colors.teal,
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const PrescriptionSettingsScreen(),
+                          ),
+                        );
+                      },
+                    ).animate().fadeIn(delay: 820.ms).slideX(begin: -0.1),
 
                   _buildModernDrawerItem(
                     context,
