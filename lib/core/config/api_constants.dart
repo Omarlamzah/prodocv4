@@ -100,6 +100,7 @@ class ApiConstants {
   static const String publicTenantWebsiteGetDefault =
       '/tenant-website/get_default_website';
   static const String updateTenantWebsiteConfig = '/tenant-website/buildmysite';
+  static const String uploadTenantWebsiteFile = '/uploadfile';
 
   // Medical Record Endpoints
 

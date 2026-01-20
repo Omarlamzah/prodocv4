@@ -71,6 +71,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _hasCheckedReview = false;
   bool _hasCheckedSubscription = false;
+  GlobalAppointmentSync? _syncService; // Save reference to avoid using ref in dispose
 
   @override
   void initState() {
@@ -78,8 +79,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     // Listen to app lifecycle changes
     WidgetsBinding.instance.addObserver(this);
     
-    // Check for review prompt after a short delay
+    // Save sync service reference before any async operations
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Save the sync service reference while widget is still mounted
+      _syncService = ref.read(globalAppointmentSyncProvider);
       _checkReviewPrompt();
       _checkSubscriptionExpiration();
       _startAppointmentSync();
@@ -90,8 +93,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
   void dispose() {
     // Remove lifecycle observer
     WidgetsBinding.instance.removeObserver(this);
-    // Stop appointment sync when leaving dashboard
-    ref.read(globalAppointmentSyncProvider).stopSync();
+    // Stop appointment sync when leaving dashboard - use saved reference
+    _syncService?.stopSync();
     super.dispose();
   }
 
@@ -212,6 +215,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
 
     if (!mounted) return;
 
+    // Save ref state before async operations to avoid using ref when unmounted
     final authState = ref.read(authProvider);
     if (authState.isAuth != true) {
       debugPrint('[Subscription Check] User not authenticated, skipping check');
@@ -1690,7 +1694,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               ),
               _ModernStatCard(
                 title: localizations?.myCalendarStat ?? 'My Calendar',
-                value: localizations?.agendaStat ?? 'Agenda',
+                value: _safeList(data['upcoming_appointments'])
+                        .length
+                        .toString(),
                 color: const Color(0xFF10B981),
                 subtitle: localizations?.manageMyDatesStat ?? 'Manage my dates',
                 icon: Icons.calendar_month_rounded,

@@ -4,7 +4,11 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import '../providers/tenant_website_providers.dart';
 import '../data/models/tenant_website_model.dart';
 import '../core/utils/result.dart';
@@ -54,6 +58,31 @@ class _CabinetInfoScreenState extends ConsumerState<CabinetInfoScreen> {
   final TextEditingController _newServiceController = TextEditingController();
 
   TenantWebsiteModel? _currentWebsite;
+
+  // Image picker
+  final ImagePicker _imagePicker = ImagePicker();
+
+  // Selected images for upload (for mobile/desktop)
+  File? _selectedLogo;
+  File? _selectedFavicon;
+  File? _selectedHeroImage;
+  File? _selectedSeoImage;
+
+  // Selected image bytes for upload (for web)
+  Uint8List? _selectedLogoBytes;
+  Uint8List? _selectedFaviconBytes;
+  Uint8List? _selectedHeroImageBytes;
+  Uint8List? _selectedSeoImageBytes;
+  String? _selectedLogoFileName;
+  String? _selectedFaviconFileName;
+  String? _selectedHeroImageFileName;
+  String? _selectedSeoImageFileName;
+
+  // Uploading states
+  bool _uploadingLogo = false;
+  bool _uploadingFavicon = false;
+  bool _uploadingHeroImage = false;
+  bool _uploadingSeoImage = false;
 
   @override
   void dispose() {
@@ -282,6 +311,204 @@ class _CabinetInfoScreenState extends ConsumerState<CabinetInfoScreen> {
 
   void _cancelEditing() {
     setState(() => _isEditing = false);
+    // Clear selected images
+    _selectedLogo = null;
+    _selectedFavicon = null;
+    _selectedHeroImage = null;
+    _selectedSeoImage = null;
+    _selectedLogoBytes = null;
+    _selectedFaviconBytes = null;
+    _selectedHeroImageBytes = null;
+    _selectedSeoImageBytes = null;
+  }
+
+  Future<void> _pickImage(String fieldName) async {
+    try {
+      final XFile? pickedFile = await _imagePicker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 85,
+      );
+
+      if (pickedFile != null) {
+        if (kIsWeb) {
+          final bytes = await pickedFile.readAsBytes();
+          setState(() {
+            switch (fieldName) {
+              case 'logo':
+                _selectedLogoBytes = bytes;
+                _selectedLogoFileName = pickedFile.name;
+                break;
+              case 'favicon':
+                _selectedFaviconBytes = bytes;
+                _selectedFaviconFileName = pickedFile.name;
+                break;
+              case 'hero_image':
+                _selectedHeroImageBytes = bytes;
+                _selectedHeroImageFileName = pickedFile.name;
+                break;
+              case 'seo_image':
+                _selectedSeoImageBytes = bytes;
+                _selectedSeoImageFileName = pickedFile.name;
+                break;
+            }
+          });
+        } else {
+          final file = File(pickedFile.path);
+          setState(() {
+            switch (fieldName) {
+              case 'logo':
+                _selectedLogo = file;
+                break;
+              case 'favicon':
+                _selectedFavicon = file;
+                break;
+              case 'hero_image':
+                _selectedHeroImage = file;
+                break;
+              case 'seo_image':
+                _selectedSeoImage = file;
+                break;
+            }
+          });
+        }
+        // Auto-upload after selection
+        await _uploadImage(fieldName);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erreur lors de la sélection de l\'image: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _uploadImage(String fieldName) async {
+    final tenantWebsiteService = ref.read(tenantWebsiteServiceProvider);
+
+    // Set uploading state
+    setState(() {
+      switch (fieldName) {
+        case 'logo':
+          _uploadingLogo = true;
+          break;
+        case 'favicon':
+          _uploadingFavicon = true;
+          break;
+        case 'hero_image':
+          _uploadingHeroImage = true;
+          break;
+        case 'seo_image':
+          _uploadingSeoImage = true;
+          break;
+      }
+    });
+
+    try {
+      Result<Map<String, dynamic>> result;
+      if (kIsWeb) {
+        Uint8List? bytes;
+        String? fileName;
+        switch (fieldName) {
+          case 'logo':
+            bytes = _selectedLogoBytes;
+            fileName = _selectedLogoFileName;
+            break;
+          case 'favicon':
+            bytes = _selectedFaviconBytes;
+            fileName = _selectedFaviconFileName;
+            break;
+          case 'hero_image':
+            bytes = _selectedHeroImageBytes;
+            fileName = _selectedHeroImageFileName;
+            break;
+          case 'seo_image':
+            bytes = _selectedSeoImageBytes;
+            fileName = _selectedSeoImageFileName;
+            break;
+        }
+        result = await tenantWebsiteService.uploadFile(
+          fieldName: fieldName,
+          fileBytes: bytes,
+          fileName: fileName,
+        );
+      } else {
+        File? file;
+        switch (fieldName) {
+          case 'logo':
+            file = _selectedLogo;
+            break;
+          case 'favicon':
+            file = _selectedFavicon;
+            break;
+          case 'hero_image':
+            file = _selectedHeroImage;
+            break;
+          case 'seo_image':
+            file = _selectedSeoImage;
+            break;
+        }
+        result = await tenantWebsiteService.uploadFile(
+          fieldName: fieldName,
+          file: file,
+          fileName: file?.path.split('/').last,
+        );
+      }
+
+      if (result is Success<Map<String, dynamic>>) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result.data['message'] ?? 'Image téléchargée avec succès'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          // Refresh the providers to get updated images
+          ref.invalidate(tenantWebsiteConfigProvider);
+          ref.invalidate(publicTenantWebsiteProvider);
+        }
+      } else if (result is Failure<Map<String, dynamic>>) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Erreur: ${result.message}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erreur lors du téléchargement: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          switch (fieldName) {
+            case 'logo':
+              _uploadingLogo = false;
+              break;
+            case 'favicon':
+              _uploadingFavicon = false;
+              break;
+            case 'hero_image':
+              _uploadingHeroImage = false;
+              break;
+            case 'seo_image':
+              _uploadingSeoImage = false;
+              break;
+          }
+        });
+      }
+    }
   }
 
   @override
@@ -458,6 +685,64 @@ class _CabinetInfoScreenState extends ConsumerState<CabinetInfoScreen> {
                   label: 'Description',
                   icon: Icons.description_rounded,
                   maxLines: 4,
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // Images Section
+            _buildSectionCard(
+              context: context,
+              isDark: isDark,
+              icon: Icons.image_rounded,
+              title: 'Images',
+              children: [
+                _buildImageUploadField(
+                  context: context,
+                  isDark: isDark,
+                  label: 'Logo',
+                  fieldName: 'logo',
+                  currentImagePath: website.logoPath,
+                  selectedFile: _selectedLogo,
+                  selectedBytes: _selectedLogoBytes,
+                  isUploading: _uploadingLogo,
+                  onPick: () => _pickImage('logo'),
+                ),
+                const SizedBox(height: 16),
+                _buildImageUploadField(
+                  context: context,
+                  isDark: isDark,
+                  label: 'Favicon',
+                  fieldName: 'favicon',
+                  currentImagePath: website.faviconPath,
+                  selectedFile: _selectedFavicon,
+                  selectedBytes: _selectedFaviconBytes,
+                  isUploading: _uploadingFavicon,
+                  onPick: () => _pickImage('favicon'),
+                ),
+                const SizedBox(height: 16),
+                _buildImageUploadField(
+                  context: context,
+                  isDark: isDark,
+                  label: 'Image Hero (Bannière)',
+                  fieldName: 'hero_image',
+                  currentImagePath: website.heroImagePath,
+                  selectedFile: _selectedHeroImage,
+                  selectedBytes: _selectedHeroImageBytes,
+                  isUploading: _uploadingHeroImage,
+                  onPick: () => _pickImage('hero_image'),
+                ),
+                const SizedBox(height: 16),
+                _buildImageUploadField(
+                  context: context,
+                  isDark: isDark,
+                  label: 'Image SEO',
+                  fieldName: 'seo_image',
+                  currentImagePath: website.seoImagePath,
+                  selectedFile: _selectedSeoImage,
+                  selectedBytes: _selectedSeoImageBytes,
+                  isUploading: _uploadingSeoImage,
+                  onPick: () => _pickImage('seo_image'),
                 ),
               ],
             ),
@@ -2026,5 +2311,175 @@ class _CabinetInfoScreenState extends ConsumerState<CabinetInfoScreen> {
       // Handle error
       debugPrint('Could not launch $urlString');
     }
+  }
+
+  Widget _buildImageUploadField({
+    required BuildContext context,
+    required bool isDark,
+    required String label,
+    required String fieldName,
+    String? currentImagePath,
+    File? selectedFile,
+    Uint8List? selectedBytes,
+    required bool isUploading,
+    required VoidCallback onPick,
+  }) {
+    final hasCurrentImage = currentImagePath != null && currentImagePath.isNotEmpty;
+    final hasSelectedImage = selectedFile != null || selectedBytes != null;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF0F0F23) : Colors.grey[50],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark ? Colors.white10 : Colors.grey[300]!,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.image_rounded,
+                size: 20,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              // Current or selected image preview
+              if (hasCurrentImage || hasSelectedImage)
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF1A1A2E) : Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: isDark ? Colors.white10 : Colors.grey[300]!,
+                    ),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: hasSelectedImage
+                        ? (kIsWeb && selectedBytes != null
+                            ? Image.memory(
+                                selectedBytes,
+                                fit: BoxFit.cover,
+                              )
+                            : selectedFile != null
+                                ? Image.file(
+                                    selectedFile,
+                                    fit: BoxFit.cover,
+                                  )
+                                : const SizedBox())
+                        : hasCurrentImage
+                            ? Builder(
+                                builder: (context) {
+                                  String cleanPath = currentImagePath!
+                                      .replaceAll(RegExp(r'\s+'), '')
+                                      .replaceAll('\n', '')
+                                      .replaceAll('\r', '')
+                                      .replaceAll('\t', '')
+                                      .replaceAll(' ', '')
+                                      .trim();
+
+                                  if (cleanPath.startsWith('/')) {
+                                    cleanPath = cleanPath.substring(1);
+                                  }
+
+                                  final storageBase =
+                                      ApiConstants.storageBaseUrl.endsWith('/')
+                                          ? ApiConstants.storageBaseUrl.substring(
+                                              0,
+                                              ApiConstants.storageBaseUrl.length - 1)
+                                          : ApiConstants.storageBaseUrl;
+
+                                  final imageUrl = cleanPath.startsWith('http')
+                                      ? cleanPath
+                                      : '$storageBase/storage/$cleanPath'.trim();
+
+                                  return CachedNetworkImage(
+                                    imageUrl: imageUrl,
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) => const Center(
+                                        child: CircularProgressIndicator()),
+                                    errorWidget: (context, url, error) =>
+                                        const Icon(Icons.error),
+                                  );
+                                },
+                              )
+                            : const SizedBox(),
+                  ),
+                ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (hasCurrentImage)
+                      Text(
+                        'Image actuelle',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: isDark ? Colors.white70 : Colors.grey[600],
+                        ),
+                      ),
+                    if (hasSelectedImage)
+                      Text(
+                        'Nouvelle image sélectionnée',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    const SizedBox(height: 8),
+                    ElevatedButton.icon(
+                      onPressed: isUploading ? null : onPick,
+                      icon: isUploading
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : const Icon(Icons.upload_rounded, size: 18),
+                      label: Text(
+                        isUploading
+                            ? 'Téléchargement...'
+                            : hasSelectedImage
+                                ? 'Changer l\'image'
+                                : 'Sélectionner une image',
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }

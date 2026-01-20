@@ -1,4 +1,7 @@
 // lib/services/tenant_website_service.dart
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import '../core/network/api_client.dart';
 import '../core/config/api_constants.dart';
 import '../core/exceptions/api_exception.dart';
@@ -60,6 +63,69 @@ class TenantWebsiteService {
       return Failure(e.message);
     } catch (e) {
       return Failure('Failed to update tenant website config: $e');
+    }
+  }
+
+  // Upload file for tenant website (logo, favicon, hero_image, seo_image)
+  // Uses POST /uploadfile as per Laravel API
+  Future<Result<Map<String, dynamic>>> uploadFile({
+    required String fieldName, // 'logo', 'favicon', 'hero_image', or 'seo_image'
+    File? file,
+    Uint8List? fileBytes,
+    String? fileName,
+  }) async {
+    try {
+      if (file == null && fileBytes == null) {
+        return const Failure('Either file or fileBytes must be provided');
+      }
+      if (kIsWeb && (fileBytes == null || fileName == null)) {
+        return const Failure(
+            'fileBytes and fileName are required on web platform');
+      }
+      if (!kIsWeb && file == null) {
+        return const Failure('file is required on mobile/desktop platform');
+      }
+
+      dynamic responseData;
+      if (kIsWeb) {
+        // Use bytes for web
+        responseData = await apiClient.postMultipart(
+          ApiConstants.uploadTenantWebsiteFile,
+          fields: {},
+          fileBytes: {
+            fieldName: {
+              'bytes': fileBytes!,
+              'filename': fileName!,
+            },
+          },
+          requireAuth: true,
+        );
+      } else {
+        // Use File for mobile/desktop
+        Map<String, String>? fileNamesMap;
+        if (fileName != null && fileName.isNotEmpty) {
+          fileNamesMap = {fieldName: fileName};
+        }
+        responseData = await apiClient.postMultipart(
+          ApiConstants.uploadTenantWebsiteFile,
+          fields: {},
+          files: {
+            fieldName: file!,
+          },
+          fileNames: fileNamesMap,
+          requireAuth: true,
+        );
+      }
+
+      if (responseData is Map<String, dynamic>) {
+        return Success(responseData);
+      } else {
+        return Failure('Invalid response format');
+      }
+    } on ApiException catch (e) {
+      return Failure(e.message);
+    } catch (e) {
+      return Failure('Failed to upload file: $e');
     }
   }
 }
